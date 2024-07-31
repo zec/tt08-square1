@@ -17,11 +17,45 @@ module tt_um_zec_demo (
 );
 
   // All output pins must be assigned. If not used, assign to 0.
-  assign uo_out  = ui_in | uio_in;  // Example
-  assign uio_out = 0;
+  assign uio_out[7] = 0;
+  assign uio_out[6:0] = 7'b0;
   assign uio_oe  = 8'b1000_0000;
 
   // List all unused inputs to prevent warnings
-  wire _unused = &{ena, clk, rst_n, 1'b0};
+  wire _unused = &{ena, ui_in, uio_in};
+
+  wire [1:0] R; // red component
+  wire [1:0] G; // green component
+  wire [1:0] B; // blue component
+  wire vsync;   // VSync
+  wire hsync;   // HSync
+
+  wire [9:0] hpos; // X coordinate in frame
+  wire [9:0] vpos; // Y coordinate in frame
+  wire in_frame;
+
+  hvsync_generator sync_gen(
+      .clk(clk),
+      .reset(~rst_n),
+      .vsync(vsync),
+      .hsync(hsync),
+      .hpos(hpos),
+      .vpos(vpos),
+      .display_on(in_frame)
+  );
+
+  // Pinout of Tiny VGA Pmod:
+  assign uo_out[0] = R[1];
+  assign uo_out[1] = G[1];
+  assign uo_out[2] = B[1];
+  assign uo_out[3] = vsync;
+  assign uo_out[4] = R[0];
+  assign uo_out[5] = G[0];
+  assign uo_out[6] = B[0];
+  assign uo_out[7] = hsync;
+
+  assign R = 2'b00;
+  assign G = (in_frame) ? 6'b11 : 6'b0;
+  assign B = 2'b00;
 
 endmodule
