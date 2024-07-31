@@ -16,7 +16,7 @@ module hvsync_generator(
   output reg        hsync, // HSync
   output reg  [9:0] hpos,  // horizontal position in frame
   output reg  [9:0] vpos,  // vertical position in frame
-  output wire       display_on, // are we in the "addressable" part of the frame
+  output wire       display_on  // are we in the "addressable" part of the frame
                                 // (i.e., the part which actually contains image data)?
 );
 
@@ -43,23 +43,23 @@ module hvsync_generator(
 `define V_BACK 33
 
 
-always (@posedge clk) begin
+always @(posedge clk) begin
   if (reset) begin
     {vsync, hsync} <= 2'b11;
     hpos <= 10'd0;
     vpos <= 10'd0;
   end
   else begin
-    hsync <= ~((hpos >= (H_ADDR + H_FRONT)) & (hpos < (H_ADDR + H_FRONT + H_SYNC)));
-    vsync <= ~((vpos >= (V_ADDR + V_FRONT)) & (vpos < (V_ADDR + V_FRONT + V_BACK)));
-    hpos <= (hpos >= (H_ADDR + H_FRONT + H_SYNC + H_BACK - 1)) ? 10'd0 : hpos + 10'd1;
-    vpos <= (vpos >= (V_ADDR + V_FRONT + V_SYNC + V_BACK - 1)) ? 10'd0 : vpos + 10'd1;
+    hsync <= ~((hpos >= (`H_ADDR + `H_FRONT)) & (hpos < (`H_ADDR + `H_FRONT + `H_SYNC)));
+    vsync <= ~((vpos >= (`V_ADDR + `V_FRONT)) & (vpos < (`V_ADDR + `V_FRONT + `V_BACK)));
+    hpos <= (hpos >= (`H_ADDR + `H_FRONT + `H_SYNC + `H_BACK - 1)) ? 10'd0 : hpos + 10'd1;
+    vpos <= (vpos >= (`V_ADDR + `V_FRONT + `V_SYNC + `V_BACK - 1)) ? 10'd0 : vpos + 10'd1;
   end
 end
 
-wire out_of_h_addr = hpos[9] & |addr[8:7]; // "hpos >= 640"
-wire out_of_v_addr = vpos[9] | &addr[8:5]; // "vpos >= 480"
+wire out_of_h_addr = hpos[9] & |hpos[8:7]; // "hpos >= 640"
+wire out_of_v_addr = vpos[9] | &vpos[8:5]; // "vpos >= 480"
 
-assign addr = ~(out_of_h_addr | out_of_v_addr);
+assign display_on = ~(out_of_h_addr | out_of_v_addr);
 
 endmodule
