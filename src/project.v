@@ -54,8 +54,8 @@ module tt_um_zec_demo (
   assign uo_out[6] = B[0];
   assign uo_out[7] = hsync;
 
-  assign R = 2'b00;
-  assign G = (in_frame) ? 6'b11 : 6'b0;
+  assign R = ((hpos == 0) ? 2'b01 : (hpos < 639) ? 2'b10 : 2'b11) & {2{in_frame}};
+  assign G = ((vpos == 0) ? 2'b01 : (vpos < 479) ? 2'b10 : 2'b11) & {2{in_frame}};
   assign B = 2'b00;
 
 endmodule
