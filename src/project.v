@@ -54,8 +54,26 @@ module tt_um_zec_demo (
   assign uo_out[6] = B[0];
   assign uo_out[7] = hsync;
 
-  assign R = ((hpos == 0) ? 2'b01 : (hpos < 639) ? 2'b10 : 2'b11) & {2{in_frame}};
-  assign G = ((vpos == 0) ? 2'b01 : (vpos < 479) ? 2'b10 : 2'b11) & {2{in_frame}};
-  assign B = 2'b00;
+  wire [2:0] xyzzy;
+
+  lsfr #(22, 22'h20_0001) lsfr22(
+    .clk(clk),
+    .rst_n(rst_n),
+    .random(xyzzy[0])
+  );
+  lsfr #(25, 25'h100_0004) lsfr25(
+    .clk(clk),
+    .rst_n(rst_n),
+    .random(xyzzy[1])
+  );
+  lsfr #(21, 21'h10_0002) lsfr21(
+    .clk(clk),
+    .rst_n(rst_n),
+    .random(xyzzy[2])
+  );
+
+  assign R = {2{in_frame & xyzzy[0]}};
+  assign G = {2{in_frame & xyzzy[1]}};
+  assign B = {2{in_frame & xyzzy[2]}};
 
 endmodule
