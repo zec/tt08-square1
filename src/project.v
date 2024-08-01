@@ -54,7 +54,14 @@ module tt_um_zec_demo (
   assign uo_out[6] = B[0];
   assign uo_out[7] = hsync;
 
+/*
   wire [2:0] xyzzy;
+
+  // The primitive polynomials used here for LSFR taps
+  // are from Zierler and Brillhart,
+  // "On primitive trinomials (mod 2)", Information and Control, 13, 541 (1968);
+  // https://www.sciencedirect.com/science/article/pii/S001999586890973X
+  // https://core.ac.uk/download/pdf/82424278.pdf
 
   lsfr #(22, 22'h20_0001) lsfr22(
     .clk(clk),
@@ -71,9 +78,18 @@ module tt_um_zec_demo (
     .rst_n(rst_n),
     .random(xyzzy[2])
   );
+*/
 
-  assign R = {2{in_frame & xyzzy[0]}};
-  assign G = {2{in_frame & xyzzy[1]}};
-  assign B = {2{in_frame & xyzzy[2]}};
+  // basic Munching Squares demo
+  reg [8:0] frame_no;
+  always @(posedge vsync) begin
+    frame_no <= frame_no + 9'd1;
+  end
+
+  wire [8:0] x_plot = vpos[8:0] ^ frame_no;
+
+  assign R = {2{(vpos < 480) & (hpos < 512) & (hpos[8:0] == x_plot)}};
+  assign G = {2{(vpos < 480) & (hpos < 512) & (hpos[8:0] == x_plot)}};
+  assign B = {2{(vpos < 480) & (hpos < 512) & (hpos[8:0] == x_plot)}};
 
 endmodule
