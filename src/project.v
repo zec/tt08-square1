@@ -24,9 +24,9 @@ module tt_um_zec_square1 (
   // List all unused inputs to prevent warnings
   wire _unused = &{ena, ui_in, uio_in};
 
-  wire [1:0] R; // red component
-  wire [1:0] G; // green component
-  wire [1:0] B; // blue component
+  reg  [1:0] R; // red component
+  reg  [1:0] G; // green component
+  reg  [1:0] B; // blue component
   wire vsync;   // VSync
   wire hsync;   // HSync
 
@@ -133,8 +133,15 @@ module tt_um_zec_square1 (
     end
   endgenerate
 
-  assign R = ((vpos < 480) & (hpos < 512)) ? color[1:0] & {2{color[2]}} : 2'b00;
-  assign G = ((vpos < 480) & (hpos < 512)) ? color[1:0] : 2'b00;
-  assign B = ((vpos < 480) & (hpos < 512)) ? color[1:0] & {2{~color[2]}} : 2'b00;
+  always @(posedge clk) begin
+    if (!rst_n) begin
+      {R, G, B} <= 6'd0;
+    end
+    else begin
+      R <= ((vpos < 480) & (hpos < 512)) ? color[1:0] & {2{color[2]}} : 2'b00;
+      G <= ((vpos < 480) & (hpos < 512)) ? color[1:0] : 2'b00;
+      B <= ((vpos < 480) & (hpos < 512)) ? color[1:0] & {2{~color[2]}} : 2'b00;
+    end
+  end
 
 endmodule
