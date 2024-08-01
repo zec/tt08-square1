@@ -86,14 +86,24 @@ module tt_um_zec_square1 (
     frame_no <= frame_no + 9'd1;
   end
 
-  `define N_LAG 5
+  `define N_LAG 15
 
   wire [2:0] color_controls [(`N_LAG-1):0];
-  assign color_controls[0] = 3'b0_11;
-  assign color_controls[1] = 3'b1_11;
-  assign color_controls[2] = 3'b1_10;
-  assign color_controls[3] = 3'b1_01;
-  assign color_controls[4] = 3'b1_01;
+  assign color_controls[0]  = 3'b0_11;
+  assign color_controls[1]  = 3'b1_11;
+  assign color_controls[2]  = 3'b1_11;
+  assign color_controls[3]  = 3'b1_10;
+  assign color_controls[4]  = 3'b1_10;
+  assign color_controls[5]  = 3'b1_10;
+  assign color_controls[6]  = 3'b1_10;
+  assign color_controls[7]  = 3'b1_01;
+  assign color_controls[8]  = 3'b1_01;
+  assign color_controls[9]  = 3'b1_01;
+  assign color_controls[10] = 3'b1_01;
+  assign color_controls[11] = 3'b1_01;
+  assign color_controls[12] = 3'b1_01;
+  assign color_controls[13] = 3'b1_01;
+  assign color_controls[14] = 3'b1_01;
 
   wire [2:0] color_maybe [(`N_LAG-1):0];
 
@@ -102,7 +112,8 @@ module tt_um_zec_square1 (
 
   generate
     for (i = 0; i < `N_LAG; i = i + 1) begin
-      assign color_maybe[i] = (hpos[8:0] == (vpos[8:0] ^ (frame_no - i))) ? color_controls[i] : 3'b0_00;
+      wire [8:0] delay = i;
+      assign color_maybe[i] = (hpos[8:0] == (vpos[8:0] ^ (frame_no - delay))) ? color_controls[i] : 3'b0_00;
     end
   endgenerate
 
@@ -115,9 +126,9 @@ module tt_um_zec_square1 (
     end
   endgenerate
 */
-  assign color[0] = color_maybe[0][0] | color_maybe[1][0] | color_maybe[2][0] | color_maybe[3][0] | color_maybe[4][0];
-  assign color[1] = color_maybe[0][1] | color_maybe[1][1] | color_maybe[2][1] | color_maybe[3][1] | color_maybe[4][1];
-  assign color[2] = color_maybe[0][2] | color_maybe[1][2] | color_maybe[2][2] | color_maybe[3][2] | color_maybe[4][2];
+  assign color[0] = color_maybe[0][0] | color_maybe[1][0] | color_maybe[2][0] | color_maybe[3][0] | color_maybe[4][0] | color_maybe[5][0] | color_maybe[6][0] | color_maybe[7][0] | color_maybe[8][0] | color_maybe[9][0] | color_maybe[10][0] | color_maybe[11][0] | color_maybe[12][0] | color_maybe[13][0] | color_maybe[14][0];
+  assign color[1] = color_maybe[0][1] | color_maybe[1][1] | color_maybe[2][1] | color_maybe[3][1] | color_maybe[4][1] | color_maybe[5][1] | color_maybe[6][1] | color_maybe[7][1] | color_maybe[8][1] | color_maybe[9][1] | color_maybe[10][1] | color_maybe[11][1] | color_maybe[12][1] | color_maybe[13][1] | color_maybe[14][1];
+  assign color[2] = color_maybe[0][2] | color_maybe[1][2] | color_maybe[2][2] | color_maybe[3][2] | color_maybe[4][2] | color_maybe[5][2] | color_maybe[6][2] | color_maybe[7][2] | color_maybe[8][2] | color_maybe[9][2] | color_maybe[10][2] | color_maybe[11][2] | color_maybe[12][2] | color_maybe[13][2] | color_maybe[14][2];
 /*
   assign color[1] = |{color_maybe[(`N_LAG-1):0][1]};
   assign color[2] = |{color_maybe[(`N_LAG-1):0][2]};
