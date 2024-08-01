@@ -107,9 +107,7 @@ module tt_um_zec_square1 (
 
   wire [2:0] color_maybe [(`N_LAG-1):0];
 
-
-  genvar i;
-
+  genvar i, j;
   generate
     for (i = 0; i < `N_LAG; i = i + 1) begin
       wire [8:0] delay = i;
@@ -117,23 +115,23 @@ module tt_um_zec_square1 (
     end
   endgenerate
 
-  wire [2:0] color;
-/*
-  genvar j;
+  wire [(`N_LAG-1):0] cm_transposed [2:0];
+
   generate
-    for (j = 0; j < 3; j = j + 1) begin
-      assign color[j] = |{color_maybe[(`N_LAG-1):0][j]};
+    for (i = 0; i < `N_LAG; i = i + 1) begin
+      for (j = 0; j < 3; j = j + 1) begin
+        assign cm_transposed[j][i] = color_maybe[i][j];
+      end
     end
   endgenerate
-*/
-  assign color[0] = color_maybe[0][0] | color_maybe[1][0] | color_maybe[2][0] | color_maybe[3][0] | color_maybe[4][0] | color_maybe[5][0] | color_maybe[6][0] | color_maybe[7][0] | color_maybe[8][0] | color_maybe[9][0] | color_maybe[10][0] | color_maybe[11][0] | color_maybe[12][0] | color_maybe[13][0] | color_maybe[14][0];
-  assign color[1] = color_maybe[0][1] | color_maybe[1][1] | color_maybe[2][1] | color_maybe[3][1] | color_maybe[4][1] | color_maybe[5][1] | color_maybe[6][1] | color_maybe[7][1] | color_maybe[8][1] | color_maybe[9][1] | color_maybe[10][1] | color_maybe[11][1] | color_maybe[12][1] | color_maybe[13][1] | color_maybe[14][1];
-  assign color[2] = color_maybe[0][2] | color_maybe[1][2] | color_maybe[2][2] | color_maybe[3][2] | color_maybe[4][2] | color_maybe[5][2] | color_maybe[6][2] | color_maybe[7][2] | color_maybe[8][2] | color_maybe[9][2] | color_maybe[10][2] | color_maybe[11][2] | color_maybe[12][2] | color_maybe[13][2] | color_maybe[14][2];
-/*
-  assign color[1] = |{color_maybe[(`N_LAG-1):0][1]};
-  assign color[2] = |{color_maybe[(`N_LAG-1):0][2]};
-*/
 
+  wire [2:0] color;
+
+  generate
+    for (i = 0; i < 3; i = i + 1) begin
+      assign color[i] = |cm_transposed[i];
+    end
+  endgenerate
 
   assign R = ((vpos < 480) & (hpos < 512)) ? color[1:0] & {2{color[2]}} : 2'b00;
   assign G = ((vpos < 480) & (hpos < 512)) ? color[1:0] : 2'b00;
