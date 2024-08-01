@@ -87,9 +87,11 @@ module tt_um_zec_demo (
   end
 
   wire [8:0] x_plot = vpos[8:0] ^ frame_no;
+  wire [8:0] x_plot2 = vpos[8:0] ^ (frame_no - 9'd5);
+  wire [8:0] x_plot3 = vpos[8:0] ^ (frame_no - 9'd10);
 
-  assign R = {2{(vpos < 480) & (hpos < 512) & (hpos[8:0] == x_plot)}};
-  assign G = {2{(vpos < 480) & (hpos < 512) & (hpos[8:0] == x_plot)}};
-  assign B = {2{(vpos < 480) & (hpos < 512) & (hpos[8:0] == x_plot)}};
+  assign R = ((vpos < 480) & (hpos < 512)) ? (hpos[8:0] == x_plot) ? 2'b11 : (hpos[8:0] == x_plot2) ? 2'b10 : (hpos[8:0] == x_plot3) ? 2'b01 : 2'b00 : 2'b00;
+  assign G = ((vpos < 480) & (hpos < 512)) ? (hpos[8:0] == x_plot) ? 2'b11 : (hpos[8:0] == x_plot2) ? 2'b10 : (hpos[8:0] == x_plot3) ? 2'b01 : 2'b00 : 2'b00;
+  assign B = ((vpos < 480) & (hpos < 512)) ? (hpos[8:0] == x_plot) ? 2'b11 :  2'b00 : 2'b00;
 
 endmodule
