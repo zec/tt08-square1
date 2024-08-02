@@ -17,7 +17,6 @@ module tt_um_zec_square1 (
 );
 
   // All output pins must be assigned. If not used, assign to 0.
-  assign uio_out[7] = 0;
   assign uio_out[6:0] = 7'b0;
   assign uio_oe  = 8'b1000_0000;
 
@@ -86,6 +85,7 @@ module tt_um_zec_square1 (
     frame_no <= frame_no + 9'd1;
   end
 
+  // number of frames we emulate phosphor persistence for
   `define N_LAG 15
 
   wire [2:0] color_controls [(`N_LAG-1):0];
@@ -115,6 +115,9 @@ module tt_um_zec_square1 (
     end
   endgenerate
 
+  // we can only do reducing operations over the least-significant dimension,
+  // so we need to exchange dimensions in color_maybe before calculating
+  // color
   wire [(`N_LAG-1):0] cm_transposed [2:0];
 
   generate
@@ -143,5 +146,15 @@ module tt_um_zec_square1 (
       B <= ((vpos < 480) & (hpos < 512)) ? color[1:0] & {2{~color[2]}} : 2'b00;
     end
   end
+
+  // our sound, neatly contained in a module:
+
+  logistic_snd #(
+    N_OSC = 4
+  ) project_audio(
+    .clk(clk),
+    .reset(~rst_n),
+    .snd(uio_out[7])
+  );
 
 endmodule
