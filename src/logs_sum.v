@@ -11,8 +11,8 @@ module logs_sum #(
   parameter NBITS    = 3,
   parameter NADDENDS = 6
 ) (
-  input  wire [(NADDENDS-1):0][(NBITS-1):0] addends,  // the numbers to sum
-  output wire [(NBITS-1):0]                 sum       // the resulting sum
+  input  wire [(NBITS-1):0] addends [(NADDENDS-1):0],  // the numbers to sum
+  output wire [(NBITS-1):0] sum                        // the resulting sum
 );
   parameter HALF = NADDENDS / 2;
 

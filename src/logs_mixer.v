@@ -20,7 +20,7 @@ module logs_mixer #(
   reg [(K-1):0] counter;
 
   wire [(K-1):0] sum;
-  wire [(N-1):0][(K-1):0] sum_inputs;
+  wire [(K-1):0] sum_inputs [(N-1):0];
 
   genvar i;
   generate
