@@ -11,10 +11,10 @@ module logs_mixer #(
   parameter N = 1,   // number of audio inputs
   parameter K = 2    // PWM effectively divides the output by 2^K
 ) (
-  input           wire clk,      // clock
-  input           wire reset,    // reset (active HIGH)
-  input [(N-1):0] wire audio_in, // input audio lines
-  output          reg  audio_out // output audio line
+  input  wire clk,      // clock
+  input  wire reset,    // reset (active HIGH)
+  input  wire [(N-1):0] audio_in, // input audio lines
+  output reg  audio_out // output audio line
 );
   // PWM counter
   reg [(K-1):0] counter;

@@ -11,11 +11,11 @@
 module logs_nco #(
   parameter N = 5   // number of bits in phase accumulator
 ) (
-  input           wire clk,     // clock
-  input           wire reset,   // reset (active HIGH)
-  input           wire step,    // whether to step our logic
-  input [(N-2):0] wire freq_in, // frequency (in units of [frequency of clock] / 2^N)
-  output          reg  snd      // square wave out
+  input  wire clk,     // clock
+  input  wire reset,   // reset (active HIGH)
+  input  wire step,    // whether to step our logic
+  input  wire [(N-2):0] freq_in, // frequency (in units of [frequency of clock] / 2^N)
+  output reg  snd      // square wave out
 );
 
   // our phase accumulator

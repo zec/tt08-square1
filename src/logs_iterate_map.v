@@ -10,9 +10,9 @@
 module logs_iterate_map #(
   parameter FRAC = 4
 ) (
-  input  [(FRAC-1):0]   wire x,
-  input  [(2+FRAC-1):0] wire r,
-  output [(FRAC-1):0]   wire next_x
+  input  wire [(FRAC-1):0]   x,
+  input  wire [(2+FRAC-1):0] r,
+  output wire [(FRAC-1):0]   next_x
 );
   wire [(FRAC-1):0] zero_pad = 0;
   wire [(2*FRAC-1):0] intermediate_product;
