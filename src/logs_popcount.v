@@ -14,7 +14,7 @@ module logs_popcount #(
   output wire [($clog2(NBITS+1)-1):0] sum    // the resulting population count
 );
 
-  parameter HALF = NADDENDS / 2;
+  parameter HALF = NBITS / 2;
 
   // widths
   parameter WHALF = $clog2(HALF + 1);
@@ -37,7 +37,7 @@ module logs_popcount #(
         .sum(lo_sum)
       );
 
-      logs_popcount #(NADDENDS - HALF) high_bits(
+      logs_popcount #(NBITS - HALF) high_bits(
         .word(word[(NBITS-1):HALF]),
         .sum(hi_sum)
       );
