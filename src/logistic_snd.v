@@ -60,10 +60,10 @@ module logistic_snd #(
     end
   end
 
-  // TODO: make this much more space-efficient!!!
   logs_iterate_map #(FRAC) iter(
     .clk(clk),
     .reset(reset),
+
     .r(r),
     .x(x),
 
