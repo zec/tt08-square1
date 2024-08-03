@@ -298,4 +298,4 @@ module logs_divider #(
       counter <= (counter >= (N-1)) ? 0 : counter + 1;
     end
   end
-);
+endmodule
