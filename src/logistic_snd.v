@@ -41,7 +41,7 @@ module logistic_snd #(
   logs_divider #(.N(30'd30_000)) r_increment_signal(
     .clk(clk),
     .reset(reset),
-    .mod_n(increment_r),
+    .mod_n(increment_r)
   );
 
   parameter INITIAL_R = (1 << FRAC) | (1 << (FRAC - 4)); // 1.0625
@@ -84,7 +84,7 @@ module logistic_snd #(
   wire [(PHASE_BITS + FRAC - 1):0] low_frequency_w = LOW_FREQUENCY;
   wire [(PHASE_BITS + FRAC - 1):0] frequency_inc_w = FREQUENCY_INC;
   wire [(PHASE_BITS + FRAC - 1):0] x_scaled_product
-    = low_frequency + (frequency_inc_w * {(PHASE_BITS){1'b0}, x};
+    = low_frequency + (frequency_inc_w * {{(PHASE_BITS){1'b0}}, x});
 
   wire [(PHASE_BITS-2):0] scaled_x = x_scaled_product[(PHASE_BITS + FRAC - 2):FRAC];
 
