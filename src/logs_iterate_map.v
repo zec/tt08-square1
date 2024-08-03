@@ -5,24 +5,79 @@
 
 `default_nettype none
 
-// performs one iteration of the logistic map
+// performs iterations of the logistic map: x <- r * x * (1 - x)
 
 module logs_iterate_map #(
-  parameter FRAC = 4
+  parameter FRAC = 4    // number of fraction bits in numbers
 ) (
-  input  wire [(FRAC-1):0]   x,
-  input  wire [(2+FRAC-1):0] r,
-  output wire [(FRAC-1):0]   next_x
+  input  wire                clk,   // clock
+  input  wire                reset, // reset (active HIGH)
+
+  input  wire [(2+FRAC-1):0] r,  // the map parameter 'r' (2.FRAC fixed-point)
+
+  output reg  [(FRAC-1):0]   x,         // 'x', the value we iteratively apply the map to (0.FRAC fixed-point)
+  output reg                 next_ready // set to 1 when we have finished calculating a new value of 'x'
 );
-  wire [(FRAC-1):0] zero_pad = 0;
-  wire [(2*FRAC-1):0] intermediate_product;
-  wire [(2*FRAC-1):0] final_product;
+  // initial value of 'x'; 0.0625
+  parameter INITIAL_X = 1 << (FRAC - 4);
 
-  // multiply x with (1 - x)
-  assign intermediate_product = {zero_pad, x} * ~{zero_pad, x};
+  // size of multiplier output
+  parameter MULT_SZ = FRAC + (FRAC + 2);
 
-  // now, multiply (x * (1 - x)) with r
-  assign final_product = {zero_pad[(FRAC-1):2], r} * {zero_pad, intermediate_product[(2*FRAC-1):FRAC]};
+  // we multiply using iterative shift-and-add
 
-  assign next_x = final_product[(2*FRAC-1):FRAC];
+  reg [(MULT_SZ-1):0] mult1_shift; // shifted version of first multiplicand for multiplier
+  reg [(FRAC-1):0]    mult2_shift; // shifted version of second multiplicand for multiplier
+  reg [(MULT_SZ-1):0] mult_accum;  // the multiplier's accumulator
+
+  // this module operates on a cycle lasting (2 * FRAC + 3) clock cycles, to wit:
+  //
+  //            cycle(s)     :        action(s)
+  //              0          : mult1 := x;  mult2 := "1 - x";  accum := 0
+  //        1 ..= FRAC       : if (mult2[0]) { accum += mult1 }; mult1 <<= 1; mult2 <<= 1
+  //              FRAC + 1   : mult1 := r;  mult2 := accum >> [suitable shift]; accum := 0
+  // (FRAC+2) ..= (2*FRAC+1) : if (mult2[0]) { accum += mult1 }; mult1 <<= 1; mult2 <<= 1
+  //            2 * FRAC + 2 : x := accum >> [suitable shift]
+
+  parameter CYCLE_LEN = 2 * FRAC + 3;
+
+  reg [($clog2(CYCLE_LEN)-1):0] counter;
+
+  always @(posedge clk) begin
+    if (reset) begin
+      x <= INITIAL_X;
+      next_ready <= 0;
+      counter <= 0;
+    end
+    else begin
+      next_ready <= 0;
+
+      if (counter == 0) begin
+        mult_accum <= 0;
+        mult1_shift <= {{(MULT_SZ - FRAC){1'b0}}, x};
+        mult2_shift <= ~x;  // in fixed-point, essentially 1-x
+      end
+      else if ( ((counter > 0       ) && (counter <= FRAC        ))
+              | ((counter > (FRAC+1)) && (counter <= (FRAC+FRAC+1)) ) begin
+
+        if (mult2_shift[0]) begin
+          mult_accum <= mult_accum + mult1_shift;
+        end
+        mult1_shift <= {mult1_shift[(MULT_SZ-2):0], 1'b0};
+        mult2_shift <= {1'b0, mult2_shift[(FRAC-1):1]};
+
+      end
+      else if (counter == (FRAC + 1)) begin
+        mult1_shift <= {{(MULT_SZ - FRAC - 2){1'b0}}, r};
+        mult2_shift <= mult_shift[(MULT_SZ - 3):(MULT_SZ - FRAC - 2)]; // x * (1 - x)
+        mult_accum <= 0;
+      end
+      else if (counter == (FRAC+FRAC+2)) begin
+        x <= mult_accum[(MULT_SZ - 3):(MULT_SZ - FRAC - 2)]; // r * x * (1 - x)
+        next_ready <= 1;
+      end
+
+      counter <= (counter >= (CYCLE_LEN - 1)) ? 0 : counter + 1;
+    end
+  end
 endmodule

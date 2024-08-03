@@ -9,10 +9,12 @@
 //
 //         x_(n+1) := r * x_n * (1 - x_n)     (0 < x_n < 1, 1 < r < 4)
 //
-// as PWM audio.
+// as PWM'ed audio.
 
 module logistic_snd #(
   parameter N_OSC = 4,       // number of square-wave generators running
+  parameter R_INC = 1000,    // the number of iterations of the map after which
+                             // we should update 'r'
 
   parameter FREQ  = 30'd25_200_000, // frequency of clk (Hz)
   parameter LO_F  = 200,     // frequency corresponding to x_n = 0 (Hz)
@@ -29,50 +31,44 @@ module logistic_snd #(
   output wire snd    // PWM audio
 );
 
-  // this section implements the logistic map, iterating once a clock,
-  // and changing r every 30_000 clocks
+  // this section implements the logistic map,
+  // changing r every 30_000 iterations of the map
 
-  reg [(FRAC-1):0] x;   // the 'x' variable in 0.FRAC fixed-point
-  wire [(FRAC-1):0] next_x; // the next value of 'x'
+  wire [(FRAC-1):0] x;  // the 'x' variable in 0.FRAC fixed-point
+  wire next_x_ready;    // this is 1 when a new value of 'x' is produced by the
+                        // logs_iterate_map block
 
   reg [(2+FRAC-1):0] r; // the 'r' variable in 2.FRAC fixed-point
-  wire increment_r;     // should we increment 'r'?
 
-  logs_divider #(.N(30'd30_000)) r_increment_signal(
-    .clk(clk),
-    .reset(reset),
-    .mod_n(increment_r)
-  );
+  reg [($clog2(R_INC)-1):0] r_counter;
 
   parameter INITIAL_R = (1 << FRAC) | (1 << (FRAC - 4)); // 1.0625
 
   always @(posedge clk) begin
     if (reset) begin
       r <= INITIAL_R; // initialize 'r' to 1.0625
+      r_counter <= 0;
     end
     else begin
-      if (increment_r) begin
+      if (next_x_ready & (counter >= (R_INC-1))) begin
         r <= (|r) ? INITIAL_R : r + 1;  // increment, wrapping from 4.0 to INITIAL_R
+      end
+
+      if (next_x_ready) begin
+        r_counter <= (r_counter >= (R_INC-1)) ? 0 : r_counter + 1;
       end
     end
   end
 
   // TODO: make this much more space-efficient!!!
   logs_iterate_map #(FRAC) iter(
-    .x(x),
+    .clk(clk),
+    .reset(reset),
     .r(r),
-    .next_x(next_x)
-  );
-  */
+    .x(x),
 
-  always @(posedge clk) begin
-    if (reset) begin
-      x <= (1 << (FRAC - 4)); // set 'x' to 0.0625
-    end
-    else begin
-      x <= next_x;
-    end
-  end
+    .next_ready(next_x_ready)
+  );
 
 
   // this section implements the square-wave generators, the frequencies
@@ -97,11 +93,10 @@ module logistic_snd #(
   reg [($clog2(N_OSC)-1):0] f_counter;
 
   always @(posedge clk) begin
-    f_counter <= (f_counter == (N_OSC-1)) ? 0 : f_counter + 1;
-  end
-
-  always @(posedge clk) begin
-    freq[f_counter] <= scaled_x;
+    if (next_x_ready) begin
+      freq[f_counter] <= scaled_x;
+      f_counter <= (f_counter >= (N_OSC-1)) ? 0 : f_counter + 1;
+    end
   end
 
   // the output of the square-wave generators
