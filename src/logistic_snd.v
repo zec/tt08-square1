@@ -5,21 +5,28 @@
 
 `default_nettype none
 
-// A sonification of the logistic map (https://en.wikipedia.org/wiki/Logistic_map)
-// x_(n+1) := r * x_n * (1 - x_n)     (0 < x_n < 1, 1 < r < 4)
+// A sonification of the logistic map (https://en.wikipedia.org/wiki/Logistic_map):
+//
+//         x_(n+1) := r * x_n * (1 - x_n)     (0 < x_n < 1, 1 < r < 4)
+//
 // as PWM audio.
 
 module logistic_snd #(
-  parameter N_OSC = 4,
+  parameter N_OSC = 4,       // number of square-wave generators running
+
   parameter FREQ  = 30'd25_200_000, // frequency of clk (Hz)
-  parameter LO_F  = 200,    // frequency corresponding to x_n = 0 (Hz)
-  parameter HI_F  = 1200,   // frequency corresponding to x_n = 1 (Hz)
-  parameter FRAC  = 8,      // fractional part of r, x
-  parameter PHASE_BITS = 10 // number of bits in phase accumulators
+  parameter LO_F  = 200,     // frequency corresponding to x_n = 0 (Hz)
+  parameter HI_F  = 1200,    // frequency corresponding to x_n = 1 (Hz)
+
+  parameter FRAC  = 8,       // fractional part of r, x
+
+  parameter PHASE_BITS = 12, // number of bits in phase accumulators
+  parameter FREQ_RES   = 0   // approximate frequency resolution
+                             // of square-wave generators is 2^FREQ_RES Hz
 ) (
   input  wire clk,   // clock
   input  wire reset, // reset (active HIGH)
-  output wire snd,   // PWM audio
+  output wire snd    // PWM audio
 );
 
   // this section implements the logistic map, iterating once a clock,
@@ -65,16 +72,27 @@ module logistic_snd #(
     end
   end
 
+
   // this section implements the square-wave generators, the frequencies
   // being derived from values of 'x'
 
-  wire scaled_x;
+  // we make use of the fact that 25_200_000 is divisible by 128
+  parameter LOW_FREQUENCY  = (LO_F << (PHASE_BITS + PHASE_DEC - 7)) / (FREQ >> 7);
+  parameter HIGH_FREQUENCY = (HI_F << (PHASE_BITS + PHASE_DEC - 7)) / (FREQ >> 7);
+  parameter FREQUENCY_INC  = HIGH_FREQUENCY - LOW_FREQUENCY;
 
-  reg [(N_OSC-1):0][(PHASE_BITS-2):0] freq; // the frequency registers for the NCOs
+  wire [(PHASE_BITS + FRAC - 1):0] low_frequency_w = LOW_FREQUENCY;
+  wire [(PHASE_BITS + FRAC - 1):0] frequency_inc_w = FREQUENCY_INC;
+  wire [(PHASE_BITS + FRAC - 1):0] x_scaled_product
+    = low_frequency + (frequency_inc_w * {(PHASE_BITS){1'b0}, x};
 
-  // which frequency should we update now?
-  parameter F_COUNTER_BITS = $clog2(PHASE_BITS);
-  reg [(F_COUNTER_BITS-1):0] f_counter;
+  wire [(PHASE_BITS-2):0] scaled_x = x_scaled_product[(PHASE_BITS + FRAC - 2):FRAC];
+
+  // the frequency registers for the NCOs
+  reg [(N_OSC-1):0][(PHASE_BITS-2):0] freq;
+
+  // which square wave's frequency should we update now?
+  reg [($clog2(N_OSC)-1):0] f_counter;
 
   always @(posedge clk) begin
     f_counter <= (f_counter == (N_OSC-1)) ? 0 : f_counter + 1;
@@ -84,8 +102,18 @@ module logistic_snd #(
     freq[f_counter] <= scaled_x;
   end
 
-
+  // the output of the square-wave generators
   wire [(N_OSC-1):0] osc;
+
+  // log2(slowdown of phase accumulators from clk)
+  parameter PHASE_DEC = $clog2(FREQ) - PHASE_BITS - FREQ_RES;
+
+  wire nco_increment;
+  logs_divider #(1 << PHASE_DEC) nco_increment_gen(
+    .clk(clk),
+    .reset(reset),
+    .mod_n(nco_increment)
+  );
 
   genvar i;
   generate
@@ -93,15 +121,17 @@ module logistic_snd #(
       logs_nco #(PHASE_BITS) n_c_oh_my(
         .clk(clk),
         .reset(reset),
+        .step(nco_increment),
         .freq_in(freq[i]),
         .snd(osc)
       );
     end
   endgenerate
 
-  // mix the square waves and output the result!
 
-  logs_mixer #(N_OSC, $clog2(N_OSC)) mixer(
+  // this section mixes the square waves and output the result!
+
+  logs_mixer #(N_OSC, $clog2(N_OSC + 1)) mixer(
     .clk(clk),
     .reset(reset),
     .audio_in(osc),
@@ -154,7 +184,7 @@ module logs_mixer #(
   genvar i;
   generate
     for (i = 0; i < N; i = i + 1) begin
-      assign sum_inputs = {(K-1){1'b0}, audio_in[i]};
+      assign sum_inputs[i] = {(K-1){1'b0}, audio_in[i]};
     end
   endgenerate
 
@@ -224,6 +254,7 @@ module logs_nco #(
 ) (
   input           wire clk,     // clock
   input           wire reset,   // reset (active HIGH)
+  input           wire step,    // whether to step our logic
   input [(N-2):0] wire freq_in, // frequency (in units of [frequency of clock] / 2^N)
   output          reg  snd      // square wave out
 );
@@ -236,7 +267,7 @@ module logs_nco #(
       phase <= 0;
       snd <= 0;
     end
-    else begin
+    else if (step) begin
       snd <= phase[N-1];
       phase <= phase + {0,freq_in};
     end
@@ -263,8 +294,8 @@ module logs_divider #(
       mod_n <= 0;
     end
     else begin
-      mod_n   <= (counter == 0);
-      counter <= (counter == (N-1)) ? 0 : counter + 1;
+      mod_n   <= ~|counter; // "counter == 0"
+      counter <= (counter >= (N-1)) ? 0 : counter + 1;
     end
   end
 );

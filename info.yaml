@@ -20,6 +20,7 @@ project:
     - "project.v"
     - "hvsync_generator.v"
     - "lsfr.v"
+    - "logistic_snd.v"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 pinout:
