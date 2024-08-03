@@ -1,0 +1,8 @@
+[package]
+name = "ls-sim"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+hound = "^3.5"
+rubato = "^0.15"
