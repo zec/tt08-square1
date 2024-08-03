@@ -41,10 +41,10 @@ module logs_popcount #(
         .word(word[(NBITS-1):HALF]),
         .sum(hi_sum)
       );
-    end
 
-    assign sum
-      = { {(W_ALL-WHALF){1'b0}}, lo_sum } + { {(W_ALL-WREST){1'b0}}, hi_sum };
+      assign sum
+        = { {(W_ALL-WHALF){1'b0}}, lo_sum } + { {(W_ALL-WREST){1'b0}}, hi_sum };
+    end
   endgenerate
 
 endmodule
