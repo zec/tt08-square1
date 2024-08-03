@@ -89,7 +89,7 @@ module logistic_snd #(
   wire [(PHASE_BITS-2):0] scaled_x = x_scaled_product[(PHASE_BITS + FRAC - 2):FRAC];
 
   // the frequency registers for the NCOs
-  reg [(N_OSC-1):0][(PHASE_BITS-2):0] freq;
+  reg [(PHASE_BITS-2):0] freq [(N_OSC-1):0];
 
   // which square wave's frequency should we update now?
   reg [($clog2(N_OSC)-1):0] f_counter;
