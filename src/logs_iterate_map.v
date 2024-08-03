@@ -24,7 +24,7 @@ module logs_iterate_map #(
   // size of multiplier output
   parameter MULT_SZ = FRAC + (FRAC + 2);
 
-  // we multiply using iterative shift-and-add
+  // we multiply using an iterative shift-and-add algorithm
 
   reg [(MULT_SZ-1):0] mult1_shift; // shifted version of first multiplicand for multiplier
   reg [(FRAC-1):0]    mult2_shift; // shifted version of second multiplicand for multiplier
@@ -57,8 +57,8 @@ module logs_iterate_map #(
         mult1_shift <= {{(MULT_SZ - FRAC){1'b0}}, x};
         mult2_shift <= ~x;  // in fixed-point, essentially 1-x
       end
-      else if ( ((counter > 0       ) && (counter <= FRAC        ))
-              | ((counter > (FRAC+1)) && (counter <= (FRAC+FRAC+1)) ) begin
+      else if (  ((counter > 0       ) && (counter <= FRAC        ))
+              || ((counter > (FRAC+1)) && (counter <= (FRAC+FRAC+1)) ) begin
 
         if (mult2_shift[0]) begin
           mult_accum <= mult_accum + mult1_shift;
