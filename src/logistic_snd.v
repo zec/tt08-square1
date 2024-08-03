@@ -57,7 +57,7 @@ module logistic_snd #(
     end
   end
 
-  /*
+  // TODO: make this much more space-efficient!!!
   logs_iterate_map #(FRAC) iter(
     .x(x),
     .r(r),
@@ -70,8 +70,7 @@ module logistic_snd #(
       x <= (1 << (FRAC - 4)); // set 'x' to 0.0625
     end
     else begin
-      //x <= next_x;
-      x <= x + 1;
+      x <= next_x;
     end
   end
 
