@@ -28,7 +28,7 @@ module logs_nco #(
     end
     else if (step) begin
       snd <= phase[N-1];
-      phase <= phase + {0,freq_in};
+      phase <= phase + {1'b0,freq_in};
     end
   end
 endmodule
