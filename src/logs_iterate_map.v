@@ -57,8 +57,8 @@ module logs_iterate_map #(
         mult1_shift <= {{(MULT_SZ - FRAC){1'b0}}, x};
         mult2_shift <= ~x;  // in fixed-point, essentially 1-x
       end
-      else if (  ((counter > 0       ) && (counter <= FRAC        ))
-              || ((counter > (FRAC+1)) && (counter <= (FRAC+FRAC+1)) ) begin
+      else if ( ((counter > 0       ) & (counter <= FRAC         ))
+              | ((counter > (FRAC+1)) & (counter <= (FRAC+FRAC+1)))) begin
 
         if (mult2_shift[0]) begin
           mult_accum <= mult_accum + mult1_shift;
