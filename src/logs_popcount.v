@@ -22,13 +22,16 @@ module logs_popcount #(
   parameter W_ALL = $clog2(NBITS + 1);
 
   generate
-    if (NBITS == 1)
+    if (NBITS == 1) begin : gen_1bit
       assign sum = word[0];
-    else if (NBITS == 2)
+    end
+    else if (NBITS == 2) begin : gen_2bits
       assign sum = {1'b0,word[0]} + {1'b0,word[1]};
-    else if (NBITS == 3)
+    end
+    else if (NBITS == 3) begin : gen_3bits
       assign sum = {1'b0,word[0]} + {1'b0,word[1]} + {1'b0,word[2]};
-    else begin
+    end
+    else begin : gen_recurse
       wire [(WHALF-1):0] lo_sum;
       wire [(WREST-1):0] hi_sum;
 
