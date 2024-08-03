@@ -150,7 +150,7 @@ module tt_um_zec_square1 (
   // our sound, neatly contained in a module:
 
   logistic_snd #(
-    .N_OSC(1)
+    .N_OSC(8)
   ) project_audio(
     .clk(clk),
     .reset(~rst_n),
