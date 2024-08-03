@@ -57,18 +57,21 @@ module logistic_snd #(
     end
   end
 
+  /*
   logs_iterate_map #(FRAC) iter(
     .x(x),
     .r(r),
     .next_x(next_x)
   );
+  */
 
   always @(posedge clk) begin
     if (reset) begin
       x <= (1 << (FRAC - 4)); // set 'x' to 0.0625
     end
     else begin
-      x <= next_x;
+      //x <= next_x;
+      x <= x + 1;
     end
   end
 
