@@ -69,7 +69,7 @@ module logs_iterate_map #(
       end
       else if (counter == (FRAC + 1)) begin
         mult1_shift <= {{(MULT_SZ - FRAC - 2){1'b0}}, r};
-        mult2_shift <= mult_shift[(MULT_SZ - 3):(MULT_SZ - FRAC - 2)]; // x * (1 - x)
+        mult2_shift <= mult_accum[(MULT_SZ - 3):(MULT_SZ - FRAC - 2)]; // x * (1 - x)
         mult_accum <= 0;
       end
       else if (counter == (FRAC+FRAC+2)) begin
