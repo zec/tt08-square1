@@ -25,14 +25,14 @@ module logs_mixer #(
   genvar i;
   generate
     for (i = 0; i < N; i = i + 1) begin
-      assign sum_inputs[i] = {(K-1){1'b0}, audio_in[i]};
+      assign sum_inputs[i] = {{(K-1){1'b0}}, audio_in[i]};
     end
   endgenerate
 
-  logs_sum popcount #(
+  logs_sum #(
     .NBITS(K),
     .NADDENDS(N)
-  ) (
+  ) popcount (
     .addends(sum_inputs),
     .sum(sum)
   );
