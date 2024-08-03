@@ -16,25 +16,22 @@ module logs_mixer #(
   input  wire [(N-1):0] audio_in, // input audio lines
   output reg  audio_out // output audio line
 );
+  parameter SUM_WIDTH = $clog2(N + 1);
+
   // PWM counter
   reg [(K-1):0] counter;
 
   wire [(K-1):0] sum;
-  wire [(K-1):0] sum_inputs [(N-1):0];
 
-  genvar i;
   generate
-    for (i = 0; i < N; i = i + 1) begin
-      assign sum_inputs[i] = {{(K-1){1'b0}}, audio_in[i]};
+    if (K > SUM_WIDTH) begin
+      assign sum[(K-1):SUM_WIDTH] = 0;
     end
   endgenerate
 
-  logs_sum #(
-    .NBITS(K),
-    .NADDENDS(N)
-  ) popcount (
-    .addends(sum_inputs),
-    .sum(sum)
+  logs_popcount #(N) popcount(
+    .word(audio_in),
+    .sum(sum[(SUM_WIDTH-1):0])
   );
 
   always @(posedge clk) begin

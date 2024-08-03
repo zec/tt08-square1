@@ -23,7 +23,7 @@ project:
     - "logistic_snd.v"
     - "logs_iterate_map.v"
     - "logs_mixer.v"
-    - "logs_sum.v"
+    - "logs_popcount.v"
     - "logs_nco.v"
     - "logs_divider.v"
 
