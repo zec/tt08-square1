@@ -93,7 +93,7 @@ async def test_project(dut):
       # only have RGB output during the addressable portion of a frame
       assert ((new_out & RGB_MASK) == 0) or (
         ((time - last_hsync_end) >= 48) and
-        ((time - last_hsync_end) < 528) and
+        ((time - last_hsync_end) < 688) and
         ((time - last_vsync_end) >= (CLOCKS_IN_LINE * (25 + 8))) and
         ((time - last_vsync_end) < (CLOCKS_IN_LINE * (25 + 8 + 480)))
       )
