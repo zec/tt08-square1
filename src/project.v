@@ -109,7 +109,7 @@ module tt_um_zec_square1 (
 
   generate
     for (i = 0; i < 3; i = i + 1) begin
-      assign color[i] = |cm_transposed[i];
+      assign color[i] = rst_n | |cm_transposed[i];
     end
   endgenerate
 
