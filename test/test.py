@@ -59,7 +59,7 @@ async def test_project(dut):
     # step through a few video frames,
     # making sure the appropriate invariants are maintained for
     # 640 x 480 video at 60 Hz (non-interlaced)
-    for i in range(1000):
+    for i in range(2000000):
       await ClockCycles(dut.clk, 1)
       time += 1
       new_out = dut.uo_out.value
@@ -80,6 +80,7 @@ async def test_project(dut):
       if old_hsync and not new_hsync:
         if last_hsync_start is not None:
           assert (time - last_hsync_start) == CLOCKS_IN_LINE
+          assert ((time - last_vsync_start) % CLOCKS_IN_LINE) == 656
         last_hsync_start = time
 
       # end of HSync pulse
