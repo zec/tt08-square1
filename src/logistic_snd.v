@@ -44,6 +44,9 @@ module logistic_snd #(
 
   parameter INITIAL_R = (1 << FRAC) | (1 << (FRAC - 4)); // 1.0625
 
+  wire [1:0] r_top = r[(2+FRAC-1):FRAC];
+  wire [(2+FRAC-1):0] r_increment = (r_top < 2'b11) ? 4 : 1;
+
   always @(posedge clk) begin
     if (reset) begin
       r <= INITIAL_R; // initialize 'r' to 1.0625
@@ -51,7 +54,7 @@ module logistic_snd #(
     end
     else begin
       if (next_x_ready & (r_counter >= (R_INC-1))) begin
-        r <= (|r) ? INITIAL_R : r + 1;  // increment, wrapping from 4.0 to INITIAL_R
+        r <= (|r) ? INITIAL_R : r + r_increment;  // increment, wrapping from 4.0 to INITIAL_R
       end
 
       if (next_x_ready) begin

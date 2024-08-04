@@ -224,7 +224,7 @@ impl LogisticSnd {
                 next.r = if self.r >= self.r_mask {
                     self.initial_r
                 } else {
-                    self.r + 1
+                    self.r + if (self.r >> self.frac) < 3 { 4 } else { 1 }
                 };
             }
 
