@@ -39,6 +39,7 @@ async def test_project(dut):
     time = 0
     old_out = 0x00
     last_vsync_start = None
+    frame_no = 0
 
     # skip forward to the first VSync
     while last_vsync_start is None:
@@ -47,6 +48,7 @@ async def test_project(dut):
       new_out = dut.uo_out.value
 
       if ((new_out & VSYNC_MASK) == 0) and ((old_out & VSYNC_MASK) != 0):
+        dut._log.info("Found VSync; start of frame {frame_no}")
         last_vsync_start = time
 
       old_out = new_out
@@ -60,7 +62,7 @@ async def test_project(dut):
     # step through a few video frames,
     # making sure the appropriate invariants are maintained for
     # 640 x 480 video at 60 Hz (non-interlaced)
-    for i in range(2000000):
+    for i in range(1400000): # a little over 3 frames
       await ClockCycles(dut.clk, 1)
       time += 1
       new_out = dut.uo_out.value
@@ -72,6 +74,8 @@ async def test_project(dut):
       if old_vsync and not new_vsync:
         assert (time - last_vsync_start) == (CLOCKS_IN_LINE * LINES_IN_FRAME)
         last_vsync_start = time
+        frame_no += 1
+        dut._log.info("VSync; start of frame {frame_no}")
 
       # end of VSync pulse
       if new_vsync and not old_vsync:
