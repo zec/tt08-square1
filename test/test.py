@@ -70,7 +70,7 @@ async def test_project(dut):
 
       # start of VSync pulse
       if old_vsync and not new_vsync:
-        assert (time - lsat_vsync_start) == (CLOCKS_IN_LINE * LINES_IN_FRAME)
+        assert (time - last_vsync_start) == (CLOCKS_IN_LINE * LINES_IN_FRAME)
         last_vsync_start = time
 
       # end of VSync pulse
