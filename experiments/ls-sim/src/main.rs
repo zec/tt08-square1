@@ -10,12 +10,12 @@ fn main() -> std::process::ExitCode {
 
     let mut args = std::env::args().skip(1).fuse();
 
-    let numeric_args: Vec<Option<u64>> = (&mut args).take(6).map(|s| s.parse().ok()).collect();
+    let numeric_args: Vec<Option<u64>> = (&mut args).take(7).map(|s| s.parse().ok()).collect();
 
-    if numeric_args.len() < 6 {
+    if numeric_args.len() < 7 {
         return usage(true).into();
     }
-    let [Some(n_osc), Some(r_inc), Some(frac), Some(phase_bits), Some(freq_res), Some(duration), ..] =
+    let [Some(n_osc), Some(iter_len), Some(r_inc), Some(frac), Some(phase_bits), Some(freq_res), Some(duration), ..] =
         *&numeric_args[..]
     else {
         eprintln!("ls-sim: an argument that should be numeric isn\'t");
@@ -38,7 +38,7 @@ fn main() -> std::process::ExitCode {
         .truncate(false)
         .open("log.txt")
     {
-        let _ = write!(f, "\n\nls-sim N_OSC={n_osc} R_INC={r_inc} FRAC={frac} PHASE_BITS={phase_bits} FREQ_RES={freq_res} DURATION={duration} \"{out_fname}\"\n");
+        let _ = write!(f, "\n\nls-sim N_OSC={n_osc} ITER_LEN={iter_len} R_INC={r_inc} FRAC={frac} PHASE_BITS={phase_bits} FREQ_RES={freq_res} DURATION={duration} \"{out_fname}\"\n");
     }
 
     const WAV_SPEC: hound::WavSpec = hound::WavSpec {
@@ -69,6 +69,7 @@ fn main() -> std::process::ExitCode {
 
     let module_params = Parameters {
         n_osc,
+        iter_len,
         r_inc,
         frac,
         phase_bits,
@@ -113,7 +114,7 @@ fn main() -> std::process::ExitCode {
 
 fn usage(not_enough: bool) -> u8 {
     eprintln!(
-        "{}Usage: ls-sim N_OSC R_INC FRAC PHASE_BITS FREQ_RES duration filename",
+        "{}Usage: ls-sim N_OSC ITER_LEN R_INC FRAC PHASE_BITS FREQ_RES duration filename",
         if not_enough {
             "ls-sim: not enough arguments\n"
         } else {
@@ -147,6 +148,7 @@ impl Default for AudioBuffer {
 
 struct Parameters {
     n_osc: u64,
+    iter_len: u64,
     r_inc: u64,
     frac: u64,
     phase_bits: u64,
@@ -207,7 +209,7 @@ impl LogisticSnd {
             freq: (0..n_osc).map(|_| 0).collect(),
             f_counter: 0,
 
-            iter: LogsIterateMap::new(frac),
+            iter: LogsIterateMap::new(frac, params.iter_len),
             nco_increment_gen: LogsDivider::new(1 << phase_dec),
             n_c_oh_my: (0..n_osc).map(|_| LogsNCO::new(phase_bits)).collect(),
             mixer: LogsMixer::new(n_osc, clog2(n_osc).into()),
@@ -282,12 +284,12 @@ struct LogsIterateMap {
 }
 
 impl LogsIterateMap {
-    fn new(frac: u64) -> Self {
+    fn new(frac: u64, iter_len: u64) -> Self {
         Self {
             frac: frac as u32,
             frac_mask: low_bits(frac),
             r_mask: low_bits(frac + 2),
-            cycle_len: (2 * frac + 3) as u32,
+            cycle_len: (2 * frac + 3).max(iter_len) as u32,
 
             x: 1 << (frac - 4),
             next_ready: false,

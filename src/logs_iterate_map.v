@@ -8,7 +8,8 @@
 // performs iterations of the logistic map: x <- r * x * (1 - x)
 
 module logs_iterate_map #(
-  parameter FRAC = 4    // number of fraction bits in numbers
+  parameter FRAC = 4,     // number of fraction bits in numbers
+  parameter ITER_LEN = 20 // length of an iteration in clock cycles
 ) (
   input  wire                clk,   // clock
   input  wire                reset, // reset (active HIGH)
@@ -39,7 +40,7 @@ module logs_iterate_map #(
   // (FRAC+2) ..= (2*FRAC+1) : if (mult2[0]) { accum += mult1 }; mult1 <<= 1; mult2 <<= 1
   //            2 * FRAC + 2 : x := accum >> [suitable shift]
 
-  parameter CYCLE_LEN = 2 * FRAC + 3;
+  parameter CYCLE_LEN = (ITER_LEN >= (2 * FRAC + 3)) ? ITER_LEN : 2 * FRAC + 3;
 
   reg [($clog2(CYCLE_LEN)-1):0] counter;
 

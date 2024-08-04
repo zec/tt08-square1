@@ -13,6 +13,7 @@
 
 module logistic_snd #(
   parameter N_OSC = 4,       // number of square-wave generators running
+  parameter ITER_LEN = 100,  // number of clock cycles for an iteration of the map
   parameter R_INC = 1000,    // the number of iterations of the map after which
                              // we should update 'r'
 
@@ -63,7 +64,7 @@ module logistic_snd #(
     end
   end
 
-  logs_iterate_map #(FRAC) iter(
+  logs_iterate_map #(FRAC, ITER_LEN) iter(
     .clk(clk),
     .reset(reset),
 
