@@ -53,7 +53,9 @@ always @(posedge clk) begin
     hsync <= ~((hpos >= (`H_ADDR + `H_FRONT)) & (hpos < (`H_ADDR + `H_FRONT + `H_SYNC)));
     vsync <= ~((vpos >= (`V_ADDR + `V_FRONT)) & (vpos < (`V_ADDR + `V_FRONT + `V_BACK)));
     hpos <= (hpos >= (`H_ADDR + `H_FRONT + `H_SYNC + `H_BACK - 1)) ? 10'd0 : hpos + 10'd1;
-    vpos <= (vpos >= (`V_ADDR + `V_FRONT + `V_SYNC + `V_BACK - 1)) ? 10'd0 : vpos + 10'd1;
+    if (hpos >= (`H_ADDR + `H_FRONT + `H_SYNC + `H_BACK - 1)) begin
+      vpos <= (vpos >= (`V_ADDR + `V_FRONT + `V_SYNC + `V_BACK - 1)) ? 10'd0 : vpos + 10'd1;
+    end
   end
 end
 
