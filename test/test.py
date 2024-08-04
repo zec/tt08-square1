@@ -48,7 +48,7 @@ async def test_project(dut):
       new_out = dut.uo_out.value
 
       if ((new_out & VSYNC_MASK) == 0) and ((old_out & VSYNC_MASK) != 0):
-        dut._log.info("Found VSync; start of frame {frame_no}")
+        dut._log.info(f"Found VSync; start of frame {frame_no}")
         last_vsync_start = time
 
       old_out = new_out
@@ -75,7 +75,7 @@ async def test_project(dut):
         assert (time - last_vsync_start) == (CLOCKS_IN_LINE * LINES_IN_FRAME)
         last_vsync_start = time
         frame_no += 1
-        dut._log.info("VSync; start of frame {frame_no}")
+        dut._log.info(f"VSync; start of frame {frame_no}")
 
       # end of VSync pulse
       if new_vsync and not old_vsync:

@@ -118,7 +118,7 @@ module logistic_snd #(
 
   assign {max_n_osc, osc_mask}
     = (r[(FRAC+1):(FRAC-6)] == 8'b11_101000) ? {max_osc_6, {(N_OSC - N_OSC_6){1'b0}}, {N_OSC_6{1'b1}}} :
-      ((r[(FRAC+1):(FRAC-4)] == 8'b11_1101) & ~&r[(FRAC-5):(FRAC-6)]) ? {max_osc_6, {(N_OSC - N_OSC_6){1'b0}}, {N_OSC_6{1'b1}}} :
+      ((r[(FRAC+1):(FRAC-4)] == 6'b11_1101) & ~&r[(FRAC-5):(FRAC-6)]) ? {max_osc_6, {(N_OSC - N_OSC_6){1'b0}}, {N_OSC_6{1'b1}}} :
       (r[(FRAC+1):(FRAC-5)] == 7'b11_10111) ? {max_osc_5, {(N_OSC - N_OSC_5){1'b0}}, {N_OSC_5{1'b1}}} :
       {max_osc_default, {N_OSC{1'b1}}};
 
