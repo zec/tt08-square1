@@ -1,3 +1,6 @@
+% Copyright (c) 2024 Zachary Catlin
+% SPDX-License-Identifier: Apache-2.0
+
 function track_fft (fname)
   duration = 180;         % length of track in seconds
   sample_rate = 48000;    % sample rate (Hz)

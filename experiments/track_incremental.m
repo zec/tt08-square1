@@ -1,3 +1,6 @@
+% Copyright (c) 2024 Zachary Catlin
+% SPDX-License-Identifier: Apache-2.0
+
 function track_incremental (rate, start_r, end_r, duration, chip_samples, fname)
   % a test of piecewise synthesis
 

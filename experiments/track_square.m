@@ -1,3 +1,6 @@
+% Copyright (c) 2024 Zachary Catlin
+% SPDX-License-Identifier: Apache-2.0
+
 function track_square (rate, duration, start_r, end_r, num_oscillators, replacement_interval, fname)
   % attempt to fake a Fourier-like synthesis using an ensemble of square-wave oscillators
 
