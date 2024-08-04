@@ -11,7 +11,7 @@ If not using the demo board, you'll need to supply the ASIC with a
 to video and audio output devices. Note: <em>y</em>1 and <em>y</em>0 are the high-order
 and low-order bits (respectively) of color component <em>y</em>.
 
-The video part of the demo repeats with a cycle time of &asymp;8.5 seconds,
+The video part of the demo repeats with a cycle time of ~8.5 seconds,
 while the audio part repeats with a cycle time of just under 2 minutes.
 
 ## External hardware
@@ -52,9 +52,9 @@ _However,_ that would not look like the PDP-1 version!
 PDP-1 munching squares uses a Type 30 point display, which was built around
 a radar-scope CRT using P7 phosphor.
 P7 is actually a combination of two substances&mdash;a bright, short-persistence
-(decay constant &asymp;&nbsp;20 microseconds) far-blue phosphor excited by
+(decay constant ~20 microseconds) far-blue phosphor excited by
 the electron beam, and a dimmer, long-persistence
-(main decay constant &asymp;&nbsp;100 milliseconds,
+(main decay constant ~100 milliseconds,
 but with a long tail lasting ~seconds)
 yellow phosphor excited by the light from the
 blue phosphor. As a result, the points currently being plotted have a
@@ -68,7 +68,7 @@ conceptually works like this:
 ![block diagram of image-generation logic](./munching-squares.png)&nbsp;
 
 Apart from the VSync/HSync/coordinate-generating module, it's almost entirely
-combinational logic. SQUARE-1 simulates 14 frames (&asymp;1/4 second) of
+combinational logic. SQUARE-1 simulates 14 frames (~1/4 second) of
 persistence prior to the current frame&mdash;not quite a Type 30,
 but enough to get the feel of the thing on modern displays.
 
@@ -88,17 +88,26 @@ but much more interesting behavior happens when $r \in (3, 4)$:
 <br />Credit: Ap on en.wikipedia.org
 
 First, the attractor becomes a period-2 cycle, then period-4, -8, -16&hellip;
-and then it exhibits chaotic behavior. That iterating a quadratic map would
-result in such behavior came as quite a surprise in the 1960s,
+and then it exhibits chaotic behavior.
+That iteratively applying a quadratic polynomial would result in such behavior
+came as quite a surprise back in the 1960s,
 and to this day the logistic map is
 a popular demonstration of mathematical chaos in a simple system.
 
 So, what does it mean to turn the logistic map into a sound?
 The way SQUARE-1 does it, values of $x_i$ at a given $r$ are scaled and
-then used as the frequencies of an ensemble of square-wave generators,
-which are then added together to drive a PWM generator, the last being
-the sound output.
-$r$ is slowly varied over time to cover the range $[1\frac{1}{16}, 4)$.
+then used as the frequencies of an ensemble of 8 square-wave generators,
+which are then added together and used as the input to a PWM generator,
+the last providing the sound output.
+$r$ is varied to cover the range $[17/16, 4)$ over a period of ~2 minutes,
+varying faster over $r < 3$ to get to the good stuff sooner.
+
+Finally, over a few small portions of the chaotic region, we change the
+number of square-wave generators that get frequency updates
+and get mixed together. The reason is that within the chaotic region,
+there are islands of periodicity, the largest of which have attractors
+of period 3, 5, and 6. Tweaking the number of active generators to be a
+multiple of the period leads to better-sounding results in the islands.
 
 ![block diagram of logistic_snd module](./logistic_snd.png)&nbsp;
 
