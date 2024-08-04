@@ -29,24 +29,27 @@ described separately below.
 
 While the demoscene dates to the mid-1980s, people have been making
 aesthetically-interesting graphics with a tiny amount of code for much longer.
-One of the first is [munching squares], first implemented _c._ 1962 on
+One of the earliest "display hacks"
+is [munching squares], first implemented _c._ 1962 on
 MIT's [PDP-1] (hence the demo's name).
 The original version has feedback and user-configurability
 (see [Norbert Landsteiner's write-up] for more details), but a simple variant
-requires only two $N$-bit variables:
-$t$, a frame counter, and $y$, a row counter:
+requires only two $N$-bit
+variables&mdash;`t`, a frame counter, and `y`, a row counter, used thus:
 
 ```plain
 t ← 0
 loop
   wait for end of frame
-  t ← t + 1 mod 2^N
+  t ← (t + 1) mod 2^N
   for y ← 0 to 2^N-1
     plot (t XOR y, y)
 ```
 
 As the algorithm has so little state and involves simple operations,
 a "racing the beam" implementation requires little silicon area.
+SQUARE-1 uses $N = 9$ and accepts that the bottom bit of the square gets
+lost off the 640×480 screen.
 
 _However,_ that would not look like the PDP-1 version!
 PDP-1 munching squares uses a Type 30 point display, which was built around
@@ -79,7 +82,7 @@ To give a quick overview, the following iteration:
 
 <p align="center">$x_{i+1} \leftarrow r x_i (1 - x_i)$</p>
 
-takes values of $x \in (0, 1)$ to values in $(0, 1)$
+maps values of $x \in (0, 1)$ to values in $(0, 1)$
 when $r \in (1, 4)$. When $r \in (1, 3]$, the sequence
 of $x_i$ values converges to a single value (the _attractor_),
 but much more interesting behavior happens when $r \in (3, 4)$:
@@ -95,9 +98,11 @@ and to this day the logistic map is
 a popular demonstration of mathematical chaos in a simple system.
 
 So, what does it mean to turn the logistic map into a sound?
-The way SQUARE-1 does it, values of $x_i$ at a given $r$ are scaled and
-then used as the frequencies of an ensemble of 8 square-wave generators,
-which are then added together and used as the input to a PWM generator,
+The way SQUARE-1 does it, values of $x_i$ at a given $r$ are scaled
+from $(0, 1)$ to approximately $(200, 1200)$&nbsp;Hz, which are
+then used as the frequencies of an ensemble of 8 square-wave generators.
+The square waves are then added together and used
+as the input to a PWM generator,
 the last providing the sound output.
 $r$ is varied to cover the range $[17/16, 4)$ over a period of ~2 minutes,
 varying faster over $r < 3$ to get to the good stuff sooner.
@@ -107,7 +112,7 @@ number of square-wave generators that get frequency updates
 and get mixed together. The reason is that within the chaotic region,
 there are islands of periodicity, the largest of which have attractors
 of period 3, 5, and 6. Tweaking the number of active generators to be a
-multiple of the period leads to better-sounding results in the islands.
+multiple of the period leads to better-sounding results within the islands.
 
 ![block diagram of logistic_snd module](./logistic_snd.png)&nbsp;
 
