@@ -14,6 +14,7 @@ module logs_mixer #(
   input  wire clk,      // clock
   input  wire reset,    // reset (active HIGH)
   input  wire [(N-1):0] audio_in, // input audio lines
+  input  wire [(N-1):0] audio_mask, // which lines to actually mix
   output reg  audio_out // output audio line
 );
   parameter SUM_WIDTH = $clog2(N + 1);
@@ -30,7 +31,7 @@ module logs_mixer #(
   endgenerate
 
   logs_popcount #(N) popcount(
-    .word(audio_in),
+    .word(audio_in & audio_mask),
     .sum(sum[(SUM_WIDTH-1):0])
   );
 

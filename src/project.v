@@ -129,7 +129,7 @@ module tt_um_zec_square1 (
 
   logistic_snd #(
     .N_OSC(8),
-    .ITER_LEN(15_000),
+    .ITER_LEN(15_361),
     .R_INC(2),
     .FRAC(16),
     .PHASE_BITS(16),

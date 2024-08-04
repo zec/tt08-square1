@@ -88,18 +88,44 @@ module logistic_snd #(
   wire [(PHASE_BITS + FRAC - 1):0] x_scaled_product
     = low_frequency_w + (frequency_inc_w * {{(PHASE_BITS){1'b0}}, x});
 
+  // the 'x' value, appropriately scaled to a frequency for the NCOs
   wire [(PHASE_BITS-2):0] scaled_x = x_scaled_product[(PHASE_BITS + FRAC - 2):FRAC];
 
   // the frequency registers for the NCOs
   reg [(PHASE_BITS-2):0] freq [(N_OSC-1):0];
 
+  parameter FC_LEN = $(clog2(N_OSC));
+
   // which square wave's frequency should we update now?
-  reg [($clog2(N_OSC)-1):0] f_counter;
+  reg [(FC_LEN-1):0] f_counter;
+
+  // the number of oscillators we care about at any given time, minus one
+  wire [(FC_LEN-1):0] max_n_osc;
+  // which oscillators we care about at any given time
+  wire [(N_OSC-1):0] osc_mask;
+
+  wire [(FC_LEN-1):0] max_osc_default = N_OSC - 1;
+  parameter N_OSC_6 = (N_OSC < 6) ? N_OSC : 6 * (N_OSC / 6);
+  wire [(FC_LEN-1):0] max_osc_6 = N_OSC_6 - 1;
+  parameter N_OSC_5 = (N_OSC < 5) ? N_OSC : 5 * (N_OSC / 5);
+  wire [(FC_LEN-1):0] max_osc_5 = N_OSC_5 - 1;
+
+  // so, why change the number of used oscillators?
+  // because, in non-chaotic regions, it sounds better when
+  // you use a multiple of stable cycle length.
+
+  // quick and dirty selection of some regions for said special treatment:
+
+  assign {max_n_osc, osc_mask}
+    = (r[(FRAC+1):(FRAC-6)] == 8'b11_101000) ? {max_osc_6, {(N_OSC - N_OSC6){1'b0}}, {N_OSC_6{1'b1}}} :
+      ((r[(FRAC+1):(FRAC-4)] == 8'b11_1101) & ~&r[(FRAC-5):(FRAC-6)]) ? {max_osc_6, {(N_OSC - N_OSC_6){1'b0}}, {N_OSC_6{1'b1}}} :
+      (r[(FRAC+1):(FRAC-5)] == 7'b11_10111) ? {max_osc_5, {(N_OSC - N_OSC5){1'b0}}, {N_OSC_5{1'b1}}} :
+      {max_osc_default, {N_OSC{1'b1}}};
 
   always @(posedge clk) begin
     if (next_x_ready) begin
       freq[f_counter] <= scaled_x;
-      f_counter <= (f_counter >= (N_OSC-1)) ? 0 : f_counter + 1;
+      f_counter <= (f_counter >= max_n_osc) ? 0 : f_counter + 1;
     end
   end
 
@@ -136,6 +162,7 @@ module logistic_snd #(
     .clk(clk),
     .reset(reset),
     .audio_in(osc),
+    .audio_mask(osc_mask),
     .audio_out(snd)
   );
 

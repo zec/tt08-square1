@@ -164,6 +164,8 @@ struct LogisticSnd {
     r_mask: u64,
     low_frequency: u64,
     frequency_inc: u64,
+    n_osc_6: usize,
+    n_osc_5: usize,
 
     r: u64,
     r_counter: u64,
@@ -203,6 +205,8 @@ impl LogisticSnd {
             r_mask: low_bits(frac + 2),
             low_frequency,
             frequency_inc: high_frequency - low_frequency,
+            n_osc_6: (if n_osc < 6 { n_osc } else { 6 * (n_osc / 6) }) as usize,
+            n_osc_5: (if n_osc < 5 { n_osc } else { 5 * (n_osc / 5) }) as usize,
 
             r: initial_r,
             r_counter: 0,
@@ -220,6 +224,12 @@ impl LogisticSnd {
         (next.r, next.r_counter, next.f_counter) = (self.r, self.r_counter, self.f_counter);
         next.freq.clear();
         next.freq.extend_from_slice(&self.freq[..]);
+
+        let current_n_osc = match self.r >> (self.frac - 6) {
+            0b11_101000 | 0b11_110100 | 0b11_110101 | 0b11_110110 => self.n_osc_6,
+            0b11_101110 | 0b11_101111 => self.n_osc_5,
+            _ => self.n_osc,
+        };
 
         if self.iter.next_ready {
             if self.r_counter >= self.r_inc - 1 {
@@ -239,7 +249,7 @@ impl LogisticSnd {
             let scaled_x = (self.low_frequency + self.frequency_inc * self.iter.x) >> self.frac;
             next.freq[self.f_counter] = scaled_x;
 
-            next.f_counter = if self.f_counter >= self.n_osc - 1 {
+            next.f_counter = if self.f_counter >= current_n_osc - 1 {
                 0
             } else {
                 self.f_counter + 1
@@ -256,7 +266,11 @@ impl LogisticSnd {
                 self.freq[i],
             );
         }
-        self.mixer.step_into(&mut next.mixer, &self.n_c_oh_my);
+        self.mixer.step_into(
+            &mut next.mixer,
+            &self.n_c_oh_my,
+            low_bits(current_n_osc as u64),
+        );
     }
 
     pub fn snd(&self) -> f32 {
@@ -363,11 +377,42 @@ impl LogsMixer {
         }
     }
 
-    fn step_into(&self, next: &mut Self, audio_in: &[LogsNCO]) {
-        let sum: u32 = audio_in.iter().map(|nco| nco.snd as u8 as u32).sum();
+    fn step_into(&self, next: &mut Self, audio_in: &[LogsNCO], audio_mask: u64) {
+        let bits = BitsIter::new(audio_mask);
+        let sum: u32 = audio_in
+            .iter()
+            .zip(bits)
+            .filter_map(|(nco, include)| {
+                if include {
+                    Some(nco.snd as u8 as u32)
+                } else {
+                    None
+                }
+            })
+            .sum();
 
         next.audio_out = sum < (self.counter & self.counter_mask);
         next.counter = self.counter.wrapping_add(1);
+    }
+}
+
+struct BitsIter {
+    n: u64,
+}
+
+impl BitsIter {
+    fn new(n: u64) -> Self {
+        Self { n }
+    }
+}
+
+impl Iterator for BitsIter {
+    type Item = bool;
+
+    fn next(&mut self) -> Option<bool> {
+        let low_bit = self.n & 0x1;
+        self.n >>= 1;
+        Some(low_bit != 0)
     }
 }
 
