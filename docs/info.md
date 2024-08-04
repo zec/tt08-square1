@@ -22,13 +22,13 @@ and audio output is obtained by connecting a [Tiny Tapeout Audio Pmod] to the BI
 
 ## How it works
 
-This contains a VGA-compatible video demo and an independent audio demo,
+SQUARE-1 contains a VGA-compatible video demo and an independent audio demo,
 described separately below.
 
 ### Video
 
 <p align="center">
-![block diagram of image-generation logic](munching-squares.png)
+![block diagram of image-generation logic](./munching-squares.png)
 </p>
 
 ### Audio
@@ -36,25 +36,28 @@ described separately below.
 The audio demo is a sonification of the [logistic map].
 To give a quick overview, the following iteration:
 
-<p align="center">_x<sub>i + 1</sub>_ &larr; _rx<sub>i</sub>_(1 - _x<sub>i</sub>_)</p>
+<p align="center">_x_ &larr; _rx_(1 - _x_)</p>
 
-takes values of _x_&nbsp;&isin;&nbsp;(0,1) to values in (0,1)
-when _r_&nbsp;&isin;&nbsp;(1,4). When _r_&nbsp;&isin;&nbsp;(1,3], the sequence
-of _x<sub>i</sub>_ converges to a single value, but much more interesting
-behavior happens when _r_&nbsp;&isin;&nbsp;(3,4):
+takes values of _x_ in (0,1) to values in (0,1)
+when _r_ is in (1,4). When _r_ is in (1,3], the sequence
+of _x_ values converges to a single value, but much more interesting
+behavior happens when _r_ is in (3,4):
 
 <p align="center">
-![attractor of the logistic map for r between 2.5 and 4](logistic-map.png)
-<br /><small>Credit: Ap on en.wikipedia.org</small>
+![attractor of the logistic map for r between 2.5 and 4](./logistic-map.png)
+</p><p align="center>
+<span style="font-size: 0.75em;">Credit: Ap on en.wikipedia.org</span>
 </p>
 
 <p align="center">
-![block diagram of logistic_snd module](logistic_snd.png)
+![block diagram of logistic_snd module](./logistic_snd.png)
 </p>
 
 ## Greetz
 
-Eh, I'm not _that_ social&hellip;<br />&hellip;Hi, Mom! Hi, Dad!
+Eh, I'm not _that_ social&hellip;
+
+&hellip;Hi, Mom! Hi, Dad!
 
 Well, also, thanks to the organizers of the demoscene competition for finally
 inspiring me to get off my rear and go sculpt some silicon.
