@@ -24,7 +24,7 @@ module logs_mixer #(
   wire [(K-1):0] sum;
 
   generate
-    if (K > SUM_WIDTH) begin
+    if (K > SUM_WIDTH) begin : gen_zero_pad
       assign sum[(K-1):SUM_WIDTH] = 0;
     end
   endgenerate
