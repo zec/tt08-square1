@@ -108,7 +108,7 @@ module tt_um_zec_square1 (
   wire [2:0] color;
 
   generate
-    for (i = 0; i < 3; i = i + 1) begi n
+    for (i = 0; i < 3; i = i + 1) begin
       assign color[i] = rst_n & |cm_transposed[i];
     end
   endgenerate
