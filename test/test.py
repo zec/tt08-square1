@@ -1,10 +1,16 @@
-# SPDX-FileCopyrightText: © 2024 Tiny Tapeout
+# SPDX-FileCopyrightText: © 2024 Tiny Tapeout; © 2024 Zachary Catlin
 # SPDX-License-Identifier: Apache-2.0
 
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles
 
+VSYNC_MASK = 0x08
+HSYNC_MASK = 0x80
+RGB_MASK = 0x77
+
+CLOCKS_IN_LINE = 800
+LINES_IN_FRAME = 525
 
 @cocotb.test()
 async def test_project(dut):
@@ -20,21 +26,77 @@ async def test_project(dut):
     dut.ui_in.value = 0
     dut.uio_in.value = 0
     dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 10)
-    dut.rst_n.value = 1
 
+    await ClockCycles(dut.clk, 10)
+
+    dut._log.info("Make sure outputs are at reset values");
+    assert dut.uo_out.value == 0b10001000
+    assert dut.uio_out.value == 0
+
+    dut.rst_n.value = 1
     dut._log.info("Test project behavior")
 
-    # Set the input values you want to test
-    dut.ui_in.value = 20
-    dut.uio_in.value = 30
+    time = 0
+    old_out = 0x00
+    last_vsync_start = None
 
-    # Wait for one clock cycle to see the output values
-    await ClockCycles(dut.clk, 1)
+    # skip forward to the first VSync
+    while last_vsync_start is None:
+      await ClockCycles(dut.clk, 1)
+      time += 1
+      new_out = dut.uo_out.value
 
-    # The following assersion is just an example of how to check the output values.
-    # Change it to match the actual expected output of your module:
-    assert dut.uo_out.value == 30
+      if ((new_out & VSYNC_MASK) == 0) and ((old_out & VSYNC_MASK) != 0):
+        last_vsync_start = time
+
+      old_out = new_out
+
+
+    last_hsync_start = None
+    old_vsync = ((old_out & VSYNC_MASK) != 0)
+    old_hsync = ((old_out & HSYNC_MASK) != 0)
+
+    # step through a few video frames,
+    # making sure the appropriate invariants are maintained for
+    # 640 x 480 video at 60 Hz (non-interlaced)
+    for i in range(1000):
+      await ClockCycle(dut.clk, 1)
+      time += 1
+      new_out = dut.uo_out.value
+
+      new_vsync = ((new_out & VSYNC_MASK) != 0)
+      new_hsync = ((new_out & HSYNC_MASK) != 0)
+
+      # start of VSync pulse
+      if old_vsync and not new_vsync:
+        assert (time - lsat_vsync_start) == (CLOCKS_IN_LINE * LINES_IN_FRAME)
+        last_vsync_start = time
+
+      # end of VSync pulse
+      if new_vsync and not old_vsync:
+        assert (time - last_vsync_start) == (CLOCKS_IN_LINE * 2)
+
+      # start of HSync pulse
+      if old_hsync and not new_hsync:
+        if last_hsync_start is not None:
+          assert (time - last_hsync_start) == CLOCKS_IN_LINE
+        last_hsync_start = time
+
+      # end of HSync pulse
+      if new_hsync and not old_hsync:
+        assert (time - last_hsync_start) == 96
+
+      # only have RGB output during the addressable portion of a frame
+      assert ((new_out & RGB_MASK) == 0) or (
+        ((time - last_hsync_end) >= 48) and
+        ((time - last_hsync_end) < 528) and
+        ((time - last_vsync_end) >= (CLOCKS_IN_LINE * (25 + 8))) and
+        ((time - last_vsync_end) < (CLOCKS_IN_LINE * (25 + 8 + 480)))
+      )
+
+      old_out, old_vsync, old_hsync = new_out, new_vsync, new_hsync
+
+
 
     # Keep testing the module by changing the input values, waiting for
     # one or more clock cycles, and asserting the expected output values.
