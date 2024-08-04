@@ -1,7 +1,7 @@
 function track_fft (fname)
   duration = 180;         % length of track in seconds
   sample_rate = 48000;    % sample rate (Hz)
-  fft_sz = 1024;          % size of IFFT; must be a power of 2
+  fft_sz = 2048;          % size of IFFT; must be a power of 2
 
   freq_lo = 200;          % frequency range used is approx.
   freq_hi = 1200;         % [freq_lo, freq_hi] Hz
@@ -27,6 +27,9 @@ function track_fft (fname)
     s_idx = (i - 1) * fft_sz + 1;
     samp(s_idx:(s_idx + fft_sz - 1)) = real(ifft(hist));
   endfor
+
+  summary = sprintf('track_ffd %d %f %d %s', sample_rate, duration, fft_sz, fname);
+  save -text -append 'log.txt' summary;
 
   audiowrite(fname, samp, sample_rate);
 endfunction

@@ -50,7 +50,7 @@ fn main() -> std::process::ExitCode {
     let mut writer = hound::WavWriter::create(out_fname, WAV_SPEC).unwrap();
 
     const INTERP_PARAMS: SincInterpolationParameters = SincInterpolationParameters {
-        sinc_len: 4096,
+        sinc_len: 128,
         f_cutoff: 0.95,
         oversampling_factor: 128,
         interpolation: rubato::SincInterpolationType::Linear,
