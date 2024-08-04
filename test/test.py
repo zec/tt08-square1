@@ -60,7 +60,7 @@ async def test_project(dut):
     # making sure the appropriate invariants are maintained for
     # 640 x 480 video at 60 Hz (non-interlaced)
     for i in range(1000):
-      await ClockCycle(dut.clk, 1)
+      await ClockCycles(dut.clk, 1)
       time += 1
       new_out = dut.uo_out.value
 
