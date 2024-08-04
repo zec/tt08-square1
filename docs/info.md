@@ -8,8 +8,8 @@ Enable the reset again when you're done.
 
 If not using the demo board, you'll need to supply the ASIC with a
 25.175&nbsp;MHz or 25.200&nbsp;MHz clock and use the pinout to connect
-to video and audio output devices. Note: _x_1 and _x_0 are the high-order
-and low-order bits of color component _x_.
+to video and audio output devices. Note: <em>x</em>1 and <em>x</em>0 are the high-order
+and low-order bits of color component <em>x</em>.
 
 The video part of the demo repeats with a cycle time of ~8.5 seconds,
 while the audio part repeats with a cycle time of just under 2 minutes.
@@ -27,31 +27,24 @@ described separately below.
 
 ### Video
 
-<p align="center">
-![block diagram of image-generation logic](./munching-squares.png)
-</p>
+![block diagram of image-generation logic](./munching-squares.png)&nbsp;
 
 ### Audio
 
 The audio demo is a sonification of the [logistic map].
 To give a quick overview, the following iteration:
 
-<p align="center">_x_ &larr; _rx_(1 - _x_)</p>
+<p align="center">$x_{i+1} \leftarrow r x_i (1 - x_i)$</p>
 
-takes values of _x_ in (0,1) to values in (0,1)
-when _r_ is in (1,4). When _r_ is in (1,3], the sequence
-of _x_ values converges to a single value, but much more interesting
-behavior happens when _r_ is in (3,4):
+takes values of $x \in (0, 1)$ to values in $(0, 1)$
+when $r \in (1, 4)$. When $r \in (1, 3]$, the sequence
+of $x_i$ values converges to a single value, but much more interesting
+behavior happens when $r \in (3, 4)$:
 
-<p align="center">
 ![attractor of the logistic map for r between 2.5 and 4](./logistic-map.png)
-</p><p align="center>
-<span style="font-size: 0.75em;">Credit: Ap on en.wikipedia.org</span>
-</p>
+<br />Credit: Ap on en.wikipedia.org
 
-<p align="center">
-![block diagram of logistic_snd module](./logistic_snd.png)
-</p>
+![block diagram of logistic_snd module](./logistic_snd.png)&nbsp;
 
 ## Greetz
 
@@ -62,7 +55,7 @@ Eh, I'm not _that_ social&hellip;
 Well, also, thanks to the organizers of the demoscene competition for finally
 inspiring me to get off my rear and go sculpt some silicon.
 Thanks as well to the open source EDA and silicon communities for making
-this all feasible.
+all this feasible.
 
 [TT demo board]: https://tinytapeout.com/specs/pcb/
 [Tiny VGA Pmod]: https://github.com/mole99/tiny-vga
