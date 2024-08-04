@@ -151,7 +151,9 @@ module tt_um_zec_square1 (
 
   logistic_snd #(
     .N_OSC(8),
-    .FRAC(12)
+    .R_INC(650),
+    .FRAC(16),
+    .PHASE_BITS(16)
   ) project_audio(
     .clk(clk),
     .reset(~rst_n),

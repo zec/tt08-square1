@@ -28,7 +28,7 @@ function track_fft (fname)
     samp(s_idx:(s_idx + fft_sz - 1)) = real(ifft(hist));
   endfor
 
-  summary = sprintf('track_ffd %d %f %d %s', sample_rate, duration, fft_sz, fname);
+  summary = sprintf('track_fft %d %f %d %s', sample_rate, duration, fft_sz, fname);
   save -text -append 'log.txt' summary;
 
   audiowrite(fname, samp, sample_rate);
