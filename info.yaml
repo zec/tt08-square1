@@ -1,6 +1,6 @@
 # Tiny Tapeout project information
 project:
-  title:        '"Square 1": VGA/audio demo'      # Project title
+  title:        '"SQUARE-1": VGA/audio demo'      # Project title
   author:       "Zachary Catlin" # Your name
   discord:      "__zec__"      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
   description:  'On video: munching squares. On audio: the logistic map.'      # One line description of what your project does
