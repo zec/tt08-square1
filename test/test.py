@@ -55,6 +55,7 @@ async def test_project(dut):
     last_hsync_start = None
     old_vsync = ((old_out & VSYNC_MASK) != 0)
     old_hsync = ((old_out & HSYNC_MASK) != 0)
+    last_vsync_end, last_hsync_end = None, None
 
     # step through a few video frames,
     # making sure the appropriate invariants are maintained for
@@ -75,6 +76,7 @@ async def test_project(dut):
       # end of VSync pulse
       if new_vsync and not old_vsync:
         assert (time - last_vsync_start) == (CLOCKS_IN_LINE * 2)
+        last_vsync_end = time
 
       # start of HSync pulse
       if old_hsync and not new_hsync:
@@ -86,6 +88,7 @@ async def test_project(dut):
       # end of HSync pulse
       if new_hsync and not old_hsync:
         assert (time - last_hsync_start) == 96
+        last_hsync_end = time
 
       # only have RGB output during the addressable portion of a frame
       assert ((new_out & RGB_MASK) == 0) or (
