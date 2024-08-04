@@ -21,7 +21,7 @@ module tt_um_zec_square1 (
   assign uio_oe  = 8'b1000_0000;
 
   // List all unused inputs to prevent warnings
-  wire _unused = &{ena, ui_in, uio_in};
+  wire _unused = &{ena, ui_in, uio_in, in_frame};
 
   reg  [1:0] R; // red component
   reg  [1:0] G; // green component
@@ -43,6 +43,7 @@ module tt_um_zec_square1 (
       .display_on(in_frame)
   );
 
+
   // Pinout of Tiny VGA Pmod:
   assign uo_out[0] = R[1];
   assign uo_out[1] = G[1];
@@ -53,37 +54,13 @@ module tt_um_zec_square1 (
   assign uo_out[6] = B[0];
   assign uo_out[7] = hsync;
 
-/*
-  wire [2:0] xyzzy;
-
-  // The primitive polynomials used here for LSFR taps
-  // are from Zierler and Brillhart,
-  // "On primitive trinomials (mod 2)", Information and Control, 13, 541 (1968);
-  // https://www.sciencedirect.com/science/article/pii/S001999586890973X
-  // https://core.ac.uk/download/pdf/82424278.pdf
-
-  lsfr #(22, 22'h20_0001) lsfr22(
-    .clk(clk),
-    .rst_n(rst_n),
-    .random(xyzzy[0])
-  );
-  lsfr #(25, 25'h100_0004) lsfr25(
-    .clk(clk),
-    .rst_n(rst_n),
-    .random(xyzzy[1])
-  );
-  lsfr #(21, 21'h10_0002) lsfr21(
-    .clk(clk),
-    .rst_n(rst_n),
-    .random(xyzzy[2])
-  );
-*/
 
   // frame counter
   reg [8:0] frame_no;
   always @(posedge vsync) begin
     frame_no <= frame_no + 9'd1;
   end
+
 
   // number of frames we emulate phosphor persistence for
   `define N_LAG 15
@@ -146,6 +123,7 @@ module tt_um_zec_square1 (
       B <= ((vpos < 480) & (hpos < 512)) ? color[1:0] & {2{~color[2]}} : 2'b00;
     end
   end
+
 
   // our sound, neatly contained in a module:
 
