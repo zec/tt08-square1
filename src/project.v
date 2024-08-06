@@ -57,11 +57,19 @@ module tt_um_zec_square1 (
 
   // frame counter
   reg [8:0] frame_no;
-  always @(~rst_n) begin
-    frame_no <= 9'd0;
-  end
-  always @(posedge vsync) begin
-    frame_no <= frame_no + 9'd1;
+  reg prev_vsync;
+
+  always @(posedge clk) begin
+    if (~rst_n) begin
+      frame_no <= 9'd0;
+      prev_vsync <= 1;
+    end
+    else begin
+      if (vsync & ~prev_vsync) begin // positive edge
+        frame_no <= frame_no + 9'd1;
+      end
+      prev_vsync <= vsync;
+    end
   end
 
 

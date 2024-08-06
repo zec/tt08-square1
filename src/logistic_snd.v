@@ -99,19 +99,6 @@ module logistic_snd #(
   // which square wave's frequency should we update now?
   reg [(FC_LEN-1):0] f_counter;
 
-  always @(reset) begin
-    f_counter <= 0;
-  end
-
-  genvar j;
-  generate
-    for (j = 0; j < N_OSC; j = j + 1) begin : gen_init_freq
-      always @(reset) begin
-        freq[j] <= 0;
-      end
-    end
-  endgenerate
-
   // the number of oscillators we care about at any given time, minus one
   wire [(FC_LEN-1):0] max_n_osc;
   // which oscillators we care about at any given time
@@ -136,7 +123,17 @@ module logistic_snd #(
       {max_osc_default, {N_OSC{1'b1}}};
 
   always @(posedge clk) begin
-    if (next_x_ready) begin
+    if (reset) begin
+      f_counter <= 0;
+
+      genvar j;
+      generate
+        for (j = 0; j < N_OSC; j = j + 1) begin : gen_init_freq
+          freq[j] <= 0;
+        end
+      endgenerate
+    end
+    else if (next_x_ready) begin
       freq[f_counter] <= scaled_x;
       f_counter <= (f_counter >= max_n_osc) ? 0 : f_counter + 1;
     end
