@@ -122,16 +122,15 @@ module logistic_snd #(
       (r[(FRAC+1):(FRAC-5)] == 7'b11_10111) ? {max_osc_5, {(N_OSC - N_OSC_5){1'b0}}, {N_OSC_5{1'b1}}} :
       {max_osc_default, {N_OSC{1'b1}}};
 
+  integer j;
+
   always @(posedge clk) begin
     if (reset) begin
       f_counter <= 0;
 
-      genvar j;
-      generate
-        for (j = 0; j < N_OSC; j = j + 1) begin : gen_init_freq
-          freq[j] <= 0;
-        end
-      endgenerate
+      for (j = 0; j < N_OSC; j = j + 1) begin
+        freq[j] <= 0;
+      end
     end
     else if (next_x_ready) begin
       freq[f_counter] <= scaled_x;
