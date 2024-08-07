@@ -13,9 +13,23 @@ module tb ();
   end
 
   // Wire up the inputs and outputs:
-  reg clk;
-  reg rst_n;
+  reg clk = 0;
+  reg rst_n = 0;
   wire snd_out;
+
+  initial begin
+    clk <= 0
+    while (1) begin
+      #1
+      clk <= ~clk
+    end
+  end
+
+  initial begin
+    rst_n <= 0;
+    #9.5
+    rst_n <= 1;
+  end
 
   logistic_snd #(
     .N_OSC(8),
