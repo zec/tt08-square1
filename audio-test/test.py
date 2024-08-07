@@ -30,11 +30,16 @@ async def test_project(dut):
     w.setparams((1, 1, CLOCK_RATE, CLOCK_RATE * DURATION, 'NONE', 'not compressed'))
 
     buf = bytearray()
+    n_writes = 0
 
     for i in range(CLOCK_RATE * DURATION):
       await ClockCycles(dut.clk, 1)
-      buf.append(b'\xff' if dut.snd_out.value != 0 else b'\x00')
+      buf.append(255 if dut.snd_out.value != 0 else 0)
 
       if len(buf) >= 2097152:
         w.writeframes(buf)
         buf.clear()
+
+        n_writes += 1
+        if (n_writes % 12) == 0:
+          dut._log.info('...')
