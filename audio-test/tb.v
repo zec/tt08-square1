@@ -18,17 +18,17 @@ module tb ();
   wire snd_out;
 
   initial begin
-    clk <= 0
+    clk = 0;
     while (1) begin
       #1
-      clk <= ~clk
+      clk = ~clk;
     end
   end
 
   initial begin
-    rst_n <= 0;
+    rst_n = 0;
     #9.5
-    rst_n <= 1;
+    rst_n = 1;
   end
 
   logistic_snd #(
