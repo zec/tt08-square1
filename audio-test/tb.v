@@ -10,7 +10,6 @@ module tb ();
   initial begin
     $dumpfile("logistic_snd.vcd");
     $dumpvars(0, snd_out);
-    #1;
   end
 
   // Wire up the inputs and outputs:
