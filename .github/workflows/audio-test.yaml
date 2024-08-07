@@ -28,6 +28,7 @@ jobs:
         run: |
           cd audio-test
           make clean
+          unset PYTHONHOME
           make
           # make will return success even if the test fails, so check for failure in the results.xml
           ! grep failure results.xml
