@@ -32,16 +32,11 @@ jobs:
           # make will return success even if the test fails, so check for failure in the results.xml
           ! grep failure results.xml
 
-      - name: Resample and convert to FLAC
-        run: |
-          cd audio-test
-          sox logistic_snd.wav logistic_snd.flac -e signed -b 16 -r 48k
-
-      - name: upload audio
+      - name: Upload waveform
         if: success() || failure()
         uses: actions/upload-artifact@v4
         with:
           name: test-audio
           path: |
-            audio-test/logistic_snd.flac
+            audio-test/logistic_snd.vcd
             audio-test/results.xml
