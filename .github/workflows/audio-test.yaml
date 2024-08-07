@@ -1,0 +1,47 @@
+name: audio-test
+on:
+  - workflow_dispatch
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install iverilog, sox, and flac
+        shell: bash
+        run: sudo apt-get update && sudo apt-get install -y iverilog sox flac
+
+      # Set Python up and install cocotb
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python packages
+        shell: bash
+        run: pip install -r test/requirements.txt
+
+      - name: Run tests
+        run: |
+          cd audio-test
+          make clean
+          make
+          # make will return success even if the test fails, so check for failure in the results.xml
+          ! grep failure results.xml
+
+      - name: Resample and convert to FLAC
+        run: |
+          cd audio-test
+          sox logistic_snd.wav logistic_snd.flac -e signed -b 16 -r 48k
+
+      - name: upload audio
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-audio
+          path: |
+            audio-test/logistic_snd.flac
+            audio-test/results.xml
