@@ -3,7 +3,7 @@
 
 # defaults
 SIM ?= verilator
-EXTRA_ARGS += --trace
+EXTRA_ARGS += --trace -Wno-WIDTHEXPAND -Wno-WIDTHTRUNC
 TOPLEVEL_LANG ?= verilog
 SRC_DIR = $(PWD)/../src
 PROJECT_SOURCES = logistic_snd.v logs_iterate_map.v logs_mixer.v logs_popcount.v logs_nco.v logs_divider.v
