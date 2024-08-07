@@ -2,7 +2,8 @@
 # See https://docs.cocotb.org/en/stable/quickstart.html for more info
 
 # defaults
-SIM ?= icarus
+SIM ?= verilator
+EXTRA_ARGS += --trace
 TOPLEVEL_LANG ?= verilog
 SRC_DIR = $(PWD)/../src
 PROJECT_SOURCES = logistic_snd.v logs_iterate_map.v logs_mixer.v logs_popcount.v logs_nco.v logs_divider.v

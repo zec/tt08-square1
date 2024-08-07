@@ -3,16 +3,16 @@ on:
   - workflow_dispatch
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - name: Install iverilog, sox, and flac
+      - name: Install verilator
         shell: bash
-        run: sudo apt-get update && sudo apt-get install -y iverilog sox flac
+        run: sudo apt-get update && sudo apt-get install -y verilator
 
       # Set Python up and install cocotb
       - name: Setup python
