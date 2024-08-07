@@ -1,0 +1,8 @@
+[package]
+name = "fst2wav"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+hound = "^3.5"
+vcd = "^0.7"
