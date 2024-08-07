@@ -31,6 +31,18 @@ module tb ();
     rst_n = 1;
   end
 
+  integer n = 0;
+  initial begin
+    while (n < 120) begin
+      $display("t = %d", n);
+      #25200000
+      ;
+      #25200000
+      n = n + 1;
+    end
+    $finish;
+  end
+
   logistic_snd #(
     .N_OSC(8),
     .ITER_LEN(15_361),
