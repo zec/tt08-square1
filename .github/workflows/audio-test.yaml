@@ -18,7 +18,8 @@ jobs:
       - name: Run tests
         run: |
           cd audio-test
-          verilator --binary -O3 -j 0 --trace --timing -Wno-WIDTHEXPAND -Wno-WIDTHTRUNC tb.v ../src/l*.v
+          verilator --binary --autoflush -O3 -j 0 --trace --timing -Wno-WIDTHEXPAND -Wno-WIDTHTRUNC tb.v ../src/l*.v
+          echo 'verilator compilation finished'
           obj_dir/Vtb
 
       - name: Upload waveform

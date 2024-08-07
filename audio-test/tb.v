@@ -36,7 +36,7 @@ module tb ();
     while (n < 120) begin
       $display("t = %d", n);
       #25200000
-      ;
+      $display(".");
       #25200000
       n = n + 1;
     end
