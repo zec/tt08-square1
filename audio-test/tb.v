@@ -6,10 +6,10 @@
 */
 module tb ();
 
-  // Dump the signals to a VCD file. You can convert it to audio later.
+  // Dump the signals to a FST file. You can convert it to audio later.
   initial begin
-    $dumpfile("logistic_snd.vcd");
-    $dumpvars(0, snd_out);
+    $dumpfile("logistic_snd.fst");
+    $dumpvars(0, clk, snd_out);
   end
 
   // Wire up the inputs and outputs:
