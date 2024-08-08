@@ -41,7 +41,9 @@ module logistic_snd #(
 
   reg [(2+FRAC-1):0] r; // the 'r' variable in 2.FRAC fixed-point
 
-  reg [($clog2(R_INC)-1):0] r_counter;
+  parameter R_COUNTER_BITS = (R_INC >= 2) ? $clog2(R_INC) : 1;
+
+  reg [(R_COUNTER_BITS-1):0] r_counter;
 
   parameter INITIAL_R = (1 << FRAC) | (1 << (FRAC - 4)); // 1.0625
 
