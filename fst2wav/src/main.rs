@@ -78,5 +78,7 @@ fn main_fallible() -> Result<(), u8> {
         }
     }
 
+    eprint!("\n");
+
     Ok(())
 }

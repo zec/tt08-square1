@@ -3,7 +3,7 @@ all: logistic_snd.flac
 .PHONY: all clean
 
 logistic_snd.flac: logistic_snd.wav
-	sox $< -b 16 -r 48000 $@
+	sox -r 25200000 $< -b 16 -r 48000 $@
 
 logistic_snd.wav: target/release/fst2wav logistic_snd.fst
 	fst2vcd logistic_snd.fst | sed -e 's/^[$$]var logic/$$var wire/' | target/release/fst2wav $@
