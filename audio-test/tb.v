@@ -1,5 +1,5 @@
 `default_nettype none
-`timescale 1ns / 1ps
+`timescale 1ns / 1ns
 
 /* This testbench just instantiates the module and makes some convenient wires
    that can be driven / tested by the cocotb test.py.
@@ -17,27 +17,28 @@ module tb ();
   reg rst_n = 0;
   wire snd_out;
 
+  // 40 ns cycle = 25 MHz clock - close enough to the actual
   initial begin
     clk = 0;
     while (1) begin
-      #1
+      #20
       clk = ~clk;
     end
   end
 
   initial begin
     rst_n = 0;
-    #9.5
+    #95
     rst_n = 1;
   end
 
   integer n = 0;
   initial begin
-    while (n < 120) begin
+    while (n < 5) begin
       $display("t = %d", n);
-      #25200000
+      #500000000
       $display(".");
-      #25200000
+      #500000000
       n = n + 1;
     end
     $finish;
