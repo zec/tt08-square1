@@ -41,7 +41,7 @@ module logs_mixer #(
       counter <= 0;
     end
     else begin
-      audio_out <= (sum < counter);
+      audio_out <= (counter < sum);
       counter <= counter + 1;
     end
   end
