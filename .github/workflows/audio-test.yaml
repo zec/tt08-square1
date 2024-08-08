@@ -18,7 +18,7 @@ jobs:
       - name: Run tests
         run: |
           cd audio-test
-          verilator --binary --autoflush --threads 1 -O3 -j 0 --trace-fst --timing -Wno-WIDTHEXPAND -Wno-WIDTHTRUNC tb.v ../src/l*.v
+          verilator --binary --autoflush -O3 -j 0 --trace-fst --timing -Wno-WIDTHEXPAND -Wno-WIDTHTRUNC tb.v ../src/l*.v
           echo 'verilator compilation finished'
           obj_dir/Vtb
 
