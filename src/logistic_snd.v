@@ -59,7 +59,11 @@ module logistic_snd #(
       end
 
       if (next_x_ready) begin
+        /* verilator lint_off ASCRANGE */
+        /* verilator lint_off UNSIGNED */
         r_counter <= (r_counter >= (R_INC-1)) ? 0 : r_counter + 1;
+        /* verilator lint_on UNSIGNED */
+        /* verilator lint_on ASCRANGE */
       end
     end
   end
