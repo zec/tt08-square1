@@ -46,8 +46,8 @@ module tb ();
 
   logistic_snd #(
     .N_OSC(8),
-    .ITER_LEN(7681),
-    .R_INC(3),
+    .ITER_LEN(382),
+    .R_INC(1),
     .FRAC(16),
     .PHASE_BITS(16),
     .FREQ_RES(0)
