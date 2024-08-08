@@ -54,8 +54,8 @@ module logistic_snd #(
       r_counter <= 0;
     end
     else begin
-      if (next_x_ready & (r_counter == 0)) begin
-        r <= (|r) ? INITIAL_R : r + r_increment;  // increment, wrapping from 4.0 to INITIAL_R
+      if (next_x_ready & (r_counter >= (R_INC-1))) begin
+        r <= (&r) ? INITIAL_R : r + r_increment;  // increment, wrapping from 4.0 to INITIAL_R
       end
 
       if (next_x_ready) begin
