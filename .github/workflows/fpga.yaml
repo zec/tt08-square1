@@ -14,4 +14,7 @@ jobs:
           submodules: recursive
 
       - name: FPGA bitstream for TT ASIC Sim (ICE40UP5K)
-        uses: zec/tt-gds-action/fpga/ice40up5k@url-fix-zec
+        uses: TinyTapeout/tt-gds-action/fpga/ice40up5k@tt08
+        with:
+          tools-repo: zec/tt-support-tools
+          tools-ref: url-fix-zec

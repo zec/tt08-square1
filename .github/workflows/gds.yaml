@@ -14,16 +14,21 @@ jobs:
           submodules: recursive
 
       - name: Build GDS
-        uses: zec/TinyTapeout/tt-gds-action@url-fix-zec
+        uses: TinyTapeout/tt-gds-action@tt08
         with:
           flow: openlane2
+          tools-repo: zec/tt-support-tools
+          tools-ref: url-fix-zec
 
   precheck:
     needs: gds
     runs-on: ubuntu-latest
     steps:
       - name: Run Tiny Tapeout Precheck
-        uses: zec/TinyTapeout/tt-gds-action/precheck@url-fix-zec
+        uses: TinyTapeout/tt-gds-action/precheck@tt08
+        with:
+          tools-repo: zec/tt-support-tools
+          tools-ref: url-fix-zec
 
   gl_test:
     needs: gds
@@ -35,7 +40,10 @@ jobs:
           submodules: recursive
 
       - name: GL test
-        uses: zec/tt-gds-action/gl_test@url-fix-zec
+        uses: TinyTapeout/tt-gds-action/gl_test@tt08
+        with:
+          tools-repo: zec/tt-support-tools
+          tools-ref: url-fix-zec
 
   viewer:
     needs: gds
@@ -44,4 +52,7 @@ jobs:
       pages: write      # to deploy to Pages
       id-token: write   # to verify the deployment originates from an appropriate source
     steps:
-      - uses: zec/tt-gds-action/viewer@url-fix-zec
+      - uses: TinyTapeout/tt-gds-action/viewer@tt08
+        with:
+          tools-repo: zec/tt-support-tools
+          tools-ref: url-fix-zec
