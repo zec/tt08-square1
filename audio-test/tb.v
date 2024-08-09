@@ -34,7 +34,7 @@ module tb ();
 
   integer n = 0;
   initial begin
-    while (n < 5) begin
+    while (n < 120) begin
       $display("t = %d", n);
       #500000000
       $display(".");
