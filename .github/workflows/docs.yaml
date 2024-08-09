@@ -15,6 +15,3 @@ jobs:
 
       - name: Build docs
         uses: TinyTapeout/tt-gds-action/docs@tt08
-        with:
-          tools-repo: zec/tt-support-tools
-          tools-ref: url-fix-zec
