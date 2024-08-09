@@ -8,7 +8,7 @@ fn main() -> std::process::ExitCode {
 }
 
 fn main_fallible() -> Result<(), u8> {
-    use hound::{WavSpec, WavWriter};
+    use bwavfile::{WaveFmt, WaveWriter};
     use vcd::Value;
 
     let args: Vec<String> = std::env::args().collect();
@@ -22,35 +22,39 @@ fn main_fallible() -> Result<(), u8> {
     let stdin = std::io::stdin();
     let mut vcd_p = vcd::Parser::new(stdin.lock());
 
-    const WAV_SPEC: WavSpec = WavSpec {
-        channels: 1,
-        sample_rate: 48_000,
-        bits_per_sample: 16,
-        sample_format: hound::SampleFormat::Int,
-    };
-    let mut wav = WavWriter::create(wav_fname, WAV_SPEC).map_err(|e| {
-        eprintln!("{}: error opening {}: {}", PROG_NAME, wav_fname, e);
-        3
-    })?;
+    let mut wav = WaveWriter::create(wav_fname, WaveFmt::new_pcm_mono(25_200_000, 16))
+        .and_then(|ww| ww.audio_frame_writer())
+        .map_err(|e| {
+            eprintln!("{}: error opening {}: {}", PROG_NAME, wav_fname, e);
+            3
+        })?;
 
     let header = vcd_p.parse_header().map_err(|e| {
         eprintln!("{}: error parsing VCD header: {}", PROG_NAME, e);
         4
     })?;
 
-    let clk = header.find_var(&["TOP", "tb", "clk"]).ok_or_else(|| {
-        eprintln!("{}: could not find variable clk", PROG_NAME);
-        5
-    })?.code;
+    let clk = header
+        .find_var(&["TOP", "tb", "clk"])
+        .ok_or_else(|| {
+            eprintln!("{}: could not find variable clk", PROG_NAME);
+            5
+        })?
+        .code;
 
-    let snd_out = header.find_var(&["TOP", "tb", "snd_out"]).ok_or_else(|| {
-        eprintln!("{}: could not find variable snd_out", PROG_NAME);
-        5
-    })?.code;
+    let snd_out = header
+        .find_var(&["TOP", "tb", "snd_out"])
+        .ok_or_else(|| {
+            eprintln!("{}: could not find variable snd_out", PROG_NAME);
+            5
+        })?
+        .code;
 
     let mut clk_val = Value::X;
     let mut snd_val = Value::X;
-    let mut k: u64 = 0;
+
+    let mut sample_buf = [0i16; 0x10_0000];
+    let mut j = 0;
 
     for command_result in vcd_p {
         use vcd::Command::*;
@@ -63,13 +67,18 @@ fn main_fallible() -> Result<(), u8> {
             ChangeScalar(i, v) if i == clk => {
                 // sample snd_out on the falling edge of the clock
                 if clk_val == Value::V1 && v == Value::V0 {
-                    let sample = match snd_val { Value::V1 => i16::MAX, _ => i16::MIN };
-                    wav.write_sample(sample).unwrap();
+                    sample_buf[j] = match snd_val {
+                        Value::V1 => i16::MAX,
+                        _ => i16::MIN,
+                    };
+                    j += 1;
+                    if j >= sample_buf.len() {
+                        wav.write_frames(&sample_buf).unwrap();
+                        j = 0;
+                        eprint!(".");
+                    }
                 }
                 clk_val = v;
-
-                if (k % (1024*1024)) == 0 { eprint!("."); }
-                k = k.wrapping_add(1);
             }
             ChangeScalar(i, v) if i == snd_out => {
                 snd_val = v;
@@ -78,6 +87,10 @@ fn main_fallible() -> Result<(), u8> {
         }
     }
 
+    if j > 0 {
+        wav.write_frames(&sample_buf[..j]).unwrap();
+    }
+    let _ = wav.end().expect("failed to finalize output file");
     eprint!("\n");
 
     Ok(())
