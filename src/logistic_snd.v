@@ -128,7 +128,7 @@ module logistic_snd #(
 
   always @(posedge clk) begin
     if (reset) begin
-      f_counter <= 0;
+      f_counter <= scaled_x;
 
       for (j = 0; j < N_OSC; j = j + 1) begin
         freq[j] <= 0;
