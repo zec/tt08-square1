@@ -6,7 +6,7 @@
 `default_nettype none
 
 // numerically-controlled oscillator: generates a square wave
-// of frequency f(clk) * (freq_in / 2^N)
+// of frequency f(step) * (freq_in / 2^N)
 
 module logs_nco #(
   parameter N = 5   // number of bits in phase accumulator
