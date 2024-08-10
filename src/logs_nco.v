@@ -28,10 +28,12 @@ module logs_nco #(
 
   // iterate through Marsaglia's xorshift32 to get the value of initial_phase
   // for oscillator I
-  for (j = 0; j < I; j = j + 1) begin
-    initial_phase = (initial_phase ^ (initial_phase << 13)) & 32'hffff_ffff;
-    initial_phase = (initial_phase ^ (initial_phase >> 17)) & 32'hffff_ffff;
-    initial_phase = (initial_phase ^ (initial_phase << 5)) & 32'hffff_ffff;
+  initial begin
+    for (j = 0; j < I; j = j + 1) begin
+      initial_phase = (initial_phase ^ (initial_phase << 13)) & 32'hffff_ffff;
+      initial_phase = (initial_phase ^ (initial_phase >> 17)) & 32'hffff_ffff;
+      initial_phase = (initial_phase ^ (initial_phase << 5)) & 32'hffff_ffff;
+    end
   end
 
   always @(posedge clk) begin
