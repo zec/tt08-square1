@@ -12,7 +12,7 @@ module logs_iterate_map #(
   parameter ITER_LEN = 20 // length of an iteration in clock cycles
 ) (
   input  wire                clk,   // clock
-  input  wire                reset, // reset (active HIGH)
+  input  wire                rst_n, // reset (active LOW)
 
   input  wire [(2+FRAC-1):0] r,  // the map parameter 'r' (2.FRAC fixed-point)
 
@@ -45,8 +45,8 @@ module logs_iterate_map #(
 
   reg [($clog2(CYCLE_LEN)-1):0] counter;
 
-  always @(posedge clk or posedge reset) begin
-    if (reset) begin
+  always @(posedge clk or negedge rst_n) begin
+    if (~rst_n) begin
       x <= INITIAL_X;
       next_ready <= 0;
       counter <= 0;

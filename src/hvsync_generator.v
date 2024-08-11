@@ -11,7 +11,7 @@
 module hvsync_generator(
   input  wire       clk,   // clock, assumed to be ~25.175 or 25.2 MHz
                            // (for 640x480 pixel, 59.94 or 60 Hz video)
-  input  wire       reset, // reset (active HIGH)
+  input  wire       rst_n, // reset (active LOW)
   output reg        vsync, // VSync
   output reg        hsync, // HSync
   output reg  [9:0] hpos,  // horizontal position in frame
@@ -44,8 +44,8 @@ module hvsync_generator(
 
 // For VGA video, VSync and HSync are active-low.
 
-always @(posedge clk or posedge reset) begin
-  if (reset) begin
+always @(posedge clk or negedge rst_n) begin
+  if (~rst_n) begin
     {vsync, hsync} <= 2'b11;
     hpos <= 10'd0;
     vpos <= 10'd0;

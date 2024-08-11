@@ -12,7 +12,7 @@ module logs_mixer #(
   parameter K = 2    // PWM effectively divides the output by 2^K
 ) (
   input  wire clk,      // clock
-  input  wire reset,    // reset (active HIGH)
+  input  wire rst_n,    // reset (active LOW)
   input  wire [(N-1):0] audio_in, // input audio lines
   input  wire [(N-1):0] audio_mask, // which lines to actually mix
   output reg  audio_out // output audio line
@@ -36,8 +36,8 @@ module logs_mixer #(
     .sum(sum[(SUM_WIDTH-1):0])
   );
 
-  always @(posedge clk or posedge reset) begin
-    if (reset) begin
+  always @(posedge clk or negedge rst_n) begin
+    if (~rst_n) begin
       audio_out <= 0;
       counter <= 0;
     end

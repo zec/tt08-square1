@@ -28,7 +28,7 @@ module logistic_snd #(
                              // of square-wave generators is 2^FREQ_RES Hz
 ) (
   input  wire clk,   // clock
-  input  wire reset, // reset (active HIGH)
+  input  wire rst_n, // reset (active LOW)
   output wire snd    // PWM audio
 );
 
@@ -51,8 +51,8 @@ module logistic_snd #(
   wire [1:0] r_top = r[(2+FRAC-1):FRAC];
   wire [(2+FRAC-1):0] r_increment = (r_top < 2'b11) ? 4 : 1;
 
-  always @(posedge clk or posedge reset) begin
-    if (reset) begin
+  always @(posedge clk or negedge rst_n) begin
+    if (~rst_n) begin
       r <= INITIAL_R; // initialize 'r' to 1.0625
       r_counter <= 0;
     end
@@ -69,7 +69,7 @@ module logistic_snd #(
 
   logs_iterate_map #(FRAC, ITER_LEN) iter(
     .clk(clk),
-    .reset(reset),
+    .rst_n(rst_n),
 
     .r(r),
     .x(x),
@@ -127,8 +127,8 @@ module logistic_snd #(
 
   integer j;
 
-  always @(posedge clk or posedge reset) begin
-    if (reset) begin
+  always @(posedge clk or negedge rst_n) begin
+    if (~rst_n) begin
       f_counter <= 0;
 
       for (j = 0; j < N_OSC; j = j + 1) begin
@@ -150,7 +150,7 @@ module logistic_snd #(
   wire nco_increment;
   logs_divider #(1 << PHASE_DEC) nco_increment_gen(
     .clk(clk),
-    .reset(reset),
+    .rst_n(rst_n),
     .mod_n(nco_increment)
   );
 
@@ -159,7 +159,7 @@ module logistic_snd #(
     for (i = 0; i < N_OSC; i = i + 1) begin
       logs_nco #(PHASE_BITS) n_c_oh_my(
         .clk(clk),
-        .reset(reset),
+        .rst_n(rst_n),
         .step(nco_increment),
         .freq_in(freq[i]),
         .snd(osc[i])
@@ -172,7 +172,7 @@ module logistic_snd #(
 
   logs_mixer #(N_OSC, $clog2(N_OSC + 1)) mixer(
     .clk(clk),
-    .reset(reset),
+    .rst_n(rst_n),
     .audio_in(osc),
     .audio_mask(osc_mask),
     .audio_out(snd)

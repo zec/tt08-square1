@@ -154,7 +154,7 @@ module tt_um_zec_square1 (
     .FREQ_RES(0)
   ) project_audio(
     .clk(clk),
-    .reset(~rst_n),
+    .rst_n(rst_n),
     .snd(uio_out[7])
   );
 

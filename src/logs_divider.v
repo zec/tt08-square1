@@ -11,15 +11,15 @@ module logs_divider #(
   parameter N = 2
 ) (
   input  wire clk,    // clock
-  input  wire reset,  // reset (active HIGH)
+  input  wire rst_n,  // reset (active LOW)
   output reg  mod_n   // output (HIGH once every N clocks)
 );
 
   parameter NBITS = $clog2(N);
   reg [(NBITS-1):0] counter;
 
-  always @(posedge clk or posedge reset) begin
-    if (reset) begin
+  always @(posedge clk or negedge rst_n) begin
+    if (~rst_n) begin
       counter <= 0;
       mod_n <= 0;
     end

@@ -12,7 +12,7 @@ module logs_nco #(
   parameter N = 5   // number of bits in phase accumulator
 ) (
   input  wire clk,     // clock
-  input  wire reset,   // reset (active HIGH)
+  input  wire rst_n,   // reset (active LOW)
   input  wire step,    // whether to step our logic
   input  wire [(N-2):0] freq_in, // frequency (in units of [frequency of clock] / 2^N)
   output reg  snd      // square wave out
@@ -21,8 +21,8 @@ module logs_nco #(
   // our phase accumulator
   reg [(N-1):0] phase;
 
-  always @(posedge clk or posedge reset) begin
-    if (reset) begin
+  always @(posedge clk or negedge rst_n) begin
+    if (~rst_n) begin
       phase <= 0;
       snd <= 0;
     end
