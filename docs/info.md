@@ -63,7 +63,7 @@ the electron beam, and a dimmer, long-persistence
 (main decay constant ~100 milliseconds,
 but with a long tail lasting ~seconds)
 yellow phosphor excited by the light from the
-blue phosphor. As a result, the points currently being plotted have a
+blue phosphor. As a result, the plotted points have a
 white or blue-white appearance, then become yellow and visibly fade away.
 
 Fortunately, since each frame only has one point in each line, and said
