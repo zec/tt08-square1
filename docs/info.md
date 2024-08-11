@@ -7,7 +7,9 @@ If `rst_n` is not automatically set to logic high upon selection, you'll need to
 Enable the reset again when you're done.
 
 If not using the demo board, you'll need to supply the ASIC with a
-25.175&nbsp;MHz or 25.200&nbsp;MHz clock and use the pinout to connect
+25.175&nbsp;MHz or 25.200&nbsp;MHz clock,
+do the appropriate interactions with the project-selection logic to select `tt_um_zec_square1`,
+and use the pinout to connect
 to video and audio output devices. Note: <em>y</em>1 and <em>y</em>0 are the high-order
 and low-order bits (respectively) of color component <em>y</em>.
 
@@ -33,8 +35,8 @@ One of the earliest "display hacks"
 is [munching squares], first implemented _c._ 1962 on
 MIT's [PDP-1] (hence the demo's name).
 The original version has feedback and user-configurability
-(see [Norbert Landsteiner's write-up] for more details), but a simple variant
-requires only two $N$-bit
+(see [Norbert Landsteiner's write-up] for more details and a PDP-1 emulator),
+but a simple variant requires only two $N$-bit
 variables&mdash;`t`, a frame counter, and `y`, a row counter, used thus:
 
 ```plain
@@ -51,7 +53,8 @@ a "racing the beam" implementation requires little silicon area.
 SQUARE-1 uses $N = 9$ and accepts that the bottom bit of the square gets
 lost off the 640×480 screen.
 
-_However,_ that would not look like the PDP-1 version!
+_However,_ the results of a simple implementation of the algorithm would not
+_look_ much like the original version!
 PDP-1 munching squares uses a Type 30 point display, which was built around
 a radar-scope CRT using P7 phosphor.
 P7 is actually a combination of two substances&mdash;a bright, short-persistence
@@ -80,7 +83,7 @@ but enough to get the feel of the thing on modern displays.
 The audio demo is a sonification of the [logistic map].
 To give a quick overview, the following iteration:
 
-<p align="center">$x_{i+1} \leftarrow r x_i (1 - x_i)$</p>
+$$x_{i+1} \leftarrow r x_i (1 - x_i)$$
 
 maps values of $x \in (0, 1)$ to values in $(0, 1)$
 when $r \in (1, 4)$. When $r \in (1, 3]$, the sequence
@@ -104,7 +107,7 @@ then used as the frequencies of an ensemble of 8 square-wave generators.
 The square waves are then added together and used
 as the input to a PWM generator,
 the last providing the sound output.
-$r$ is varied to cover the range $[17/16, 4)$ over a period of ~2 minutes,
+$r$ is varied to cover the range $[\tfrac{17}{16}, 4)$ over a period of ~2 minutes,
 varying faster over $r < 3$ to get to the good stuff sooner.
 
 Finally, over a few small portions of the chaotic region, we change the
