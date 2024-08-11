@@ -1,5 +1,7 @@
 [package]
 name = "ls-sim"
+description = "Simulation of the logistic_snd module using a transcription of the HDL"
+authors = ["Zachary Catlin"]
 version = "0.0.0"
 edition = "2021"
 

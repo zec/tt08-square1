@@ -33,7 +33,7 @@ module logistic_snd #(
 );
 
   // this section implements the logistic map,
-  // changing r every 30_000 iterations of the map
+  // changing r every R_INC iterations of the map
 
   wire [(FRAC-1):0] x;  // the 'x' variable in 0.FRAC fixed-point
   wire next_x_ready;    // this is 1 when a new value of 'x' is produced by the
@@ -47,6 +47,7 @@ module logistic_snd #(
 
   parameter INITIAL_R = (1 << FRAC) | (1 << (FRAC - 4)); // 1.0625
 
+  // increment more in the area r < 3; this makes us spend more time in 3 <= r < 4
   wire [1:0] r_top = r[(2+FRAC-1):FRAC];
   wire [(2+FRAC-1):0] r_increment = (r_top < 2'b11) ? 4 : 1;
 

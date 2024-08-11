@@ -70,26 +70,27 @@ async def test_project(dut):
       new_vsync = ((new_out & VSYNC_MASK) != 0)
       new_hsync = ((new_out & HSYNC_MASK) != 0)
 
-      # start of VSync pulse
+      # start of VSync pulse; check pulse-to-pulse timing
       if old_vsync and not new_vsync:
         assert (time - last_vsync_start) == (CLOCKS_IN_LINE * LINES_IN_FRAME)
         last_vsync_start = time
         frame_no += 1
         dut._log.info(f"VSync; start of frame {frame_no}")
 
-      # end of VSync pulse
+      # end of VSync pulse; check pulse width
       if new_vsync and not old_vsync:
         assert (time - last_vsync_start) == (CLOCKS_IN_LINE * 2)
         last_vsync_end = time
 
-      # start of HSync pulse
+      # start of HSync pulse;
+      # check HSync-to-HSync and VSync-to-HSync timing
       if old_hsync and not new_hsync:
         if last_hsync_start is not None:
           assert (time - last_hsync_start) == CLOCKS_IN_LINE
           assert ((time - last_vsync_start) % CLOCKS_IN_LINE) == 656
         last_hsync_start = time
 
-      # end of HSync pulse
+      # end of HSync pulse; check pulse width
       if new_hsync and not old_hsync:
         assert (time - last_hsync_start) == 96
         last_hsync_end = time

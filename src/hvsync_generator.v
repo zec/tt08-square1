@@ -42,6 +42,7 @@ module hvsync_generator(
 // height of the back porch and top border of a frame
 `define V_BACK 33
 
+// For VGA video, VSync and HSync are active-low.
 
 always @(posedge clk) begin
   if (reset) begin

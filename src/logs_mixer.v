@@ -30,6 +30,7 @@ module logs_mixer #(
     end
   endgenerate
 
+  // sum the input lines...
   logs_popcount #(N) popcount(
     .word(audio_in & audio_mask),
     .sum(sum[(SUM_WIDTH-1):0])
@@ -41,7 +42,7 @@ module logs_mixer #(
       counter <= 0;
     end
     else begin
-      audio_out <= (counter < sum);
+      audio_out <= (counter < sum); // ...and use the sum as the PWM duty cycle
       counter <= counter + 1;
     end
   end

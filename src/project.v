@@ -23,9 +23,9 @@ module tt_um_zec_square1 (
   // List all unused inputs to prevent warnings
   wire _unused = &{ena, ui_in, uio_in, in_frame};
 
-  reg  [1:0] R; // red component
-  reg  [1:0] G; // green component
-  reg  [1:0] B; // blue component
+  reg  [1:0] R; // red component           the components are `reg`s to
+  reg  [1:0] G; // green component         match the number of reg layers from
+  reg  [1:0] B; // blue component          [hv]pos to [hv]sync for inter-signal alignment
   wire vsync;   // VSync
   wire hsync;   // HSync
 
@@ -57,6 +57,7 @@ module tt_um_zec_square1 (
 
   // frame counter
   reg [8:0] frame_no;
+  // last clock cycle's value of VSync
   reg prev_vsync;
 
   always @(posedge clk) begin
@@ -76,22 +77,25 @@ module tt_um_zec_square1 (
   // number of frames we emulate phosphor persistence for
   `define N_LAG 15
 
+  // color_controls[i] and color are 3-bit color indexes where
+  // 3'b0_00 is black, 3'b0_11 is bright cyan, and 3'b1_xx is shades of yellow
+
   wire [2:0] color_controls [(`N_LAG-1):0];
-  assign color_controls[0]  = 3'b0_11;
-  assign color_controls[1]  = 3'b1_11;
+  assign color_controls[0]  = 3'b0_11; // bright cyan for lag 0...
+  assign color_controls[1]  = 3'b1_11; // ...changing to bright yellow...
   assign color_controls[2]  = 3'b1_11;
-  assign color_controls[3]  = 3'b1_10;
+  assign color_controls[3]  = 3'b1_10; // ...fading...
   assign color_controls[4]  = 3'b1_10;
   assign color_controls[5]  = 3'b1_10;
   assign color_controls[6]  = 3'b1_10;
-  assign color_controls[7]  = 3'b1_01;
+  assign color_controls[7]  = 3'b1_01; // ...to dim yellow...
   assign color_controls[8]  = 3'b1_01;
   assign color_controls[9]  = 3'b1_01;
   assign color_controls[10] = 3'b1_01;
   assign color_controls[11] = 3'b1_01;
   assign color_controls[12] = 3'b1_01;
   assign color_controls[13] = 3'b1_01;
-  assign color_controls[14] = 3'b1_01;
+  assign color_controls[14] = 3'b1_01; // ...before going black after lag 14.
 
   wire [2:0] color_maybe [(`N_LAG-1):0];
 
@@ -99,6 +103,7 @@ module tt_um_zec_square1 (
   generate
     for (i = 0; i < `N_LAG; i = i + 1) begin
       wire [8:0] delay = i;
+      // here's the actual munching-squares algorithm:
       assign color_maybe[i] = (hpos[8:0] == (vpos[8:0] ^ (frame_no - delay))) ? color_controls[i] : 3'b0_00;
     end
   endgenerate
@@ -129,6 +134,8 @@ module tt_um_zec_square1 (
       {R, G, B} <= 6'd0;
     end
     else begin
+      // map from 3-bit color indexes to color components, and clip to
+      // a 512x480 window
       R <= ((vpos < 480) & (hpos < 512)) ? color[1:0] & {2{color[2]}} : 2'b00;
       G <= ((vpos < 480) & (hpos < 512)) ? color[1:0] : 2'b00;
       B <= ((vpos < 480) & (hpos < 512)) ? color[1:0] & {2{~color[2]}} : 2'b00;

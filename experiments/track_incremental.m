@@ -9,7 +9,7 @@ function track_incremental (rate, start_r, end_r, duration, chip_samples, fname)
   N = floor(duration * rate);
   samp = zeros(1, N); % the actual samples
 
-  phase = 0;
+  phase = 0; % phase accumulator
   x = 0.5;
 
   for i = 1:20

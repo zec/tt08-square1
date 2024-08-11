@@ -8,8 +8,8 @@ function track_square (rate, duration, start_r, end_r, num_oscillators, replacem
   samp = zeros(1, N); % the actual samples
   interval_r = (end_r - start_r) / N;
 
-  phases = zeros(1, num_oscillators);
-  freqs = zeros(1, num_oscillators);
+  phases = zeros(1, num_oscillators); % per-oscillator phase accumulators
+  freqs = zeros(1, num_oscillators);  % per-oscillator frequencies
   next_to_replace = 1;
 
   c = 1 / rate;

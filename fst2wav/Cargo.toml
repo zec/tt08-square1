@@ -1,5 +1,7 @@
 [package]
 name = "fst2wav"
+description = "Extracts high-sample-rate audio from a VCD trace on stdin"
+authors = ["Zachary Catlin"]
 version = "0.0.0"
 edition = "2021"
 

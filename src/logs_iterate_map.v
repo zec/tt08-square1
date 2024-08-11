@@ -31,7 +31,7 @@ module logs_iterate_map #(
   reg [(FRAC-1):0]    mult2_shift; // shifted version of second multiplicand for multiplier
   reg [(MULT_SZ-1):0] mult_accum;  // the multiplier's accumulator
 
-  // this module operates on a cycle lasting (2 * FRAC + 3) clock cycles, to wit:
+  // this module operates on a cycle lasting at least (2 * FRAC + 3) clock cycles, to wit:
   //
   //            cycle(s)     :        action(s)
   //              0          : mult1 := x;  mult2 := "1 - x";  accum := 0
@@ -39,6 +39,7 @@ module logs_iterate_map #(
   //              FRAC + 1   : mult1 := r;  mult2 := accum >> [suitable shift]; accum := 0
   // (FRAC+2) ..= (2*FRAC+1) : if (mult2[0]) { accum += mult1 }; mult1 <<= 1; mult2 <<= 1
   //            2 * FRAC + 2 : x := accum >> [suitable shift]
+  //      remainder (if any) : idle
 
   parameter CYCLE_LEN = (ITER_LEN >= (2 * FRAC + 3)) ? ITER_LEN : 2 * FRAC + 3;
 
