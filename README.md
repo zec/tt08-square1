@@ -1,5 +1,9 @@
 ![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg) ![](../../workflows/test/badge.svg) ![](../../workflows/fpga/badge.svg)
 
+# NOTE: ABANDONED BRANCH
+
+This branch is an experiment that didn't work out.
+
 # SQUARE-1
 
 This repository contains Verilog code for an entry into the
