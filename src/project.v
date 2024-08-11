@@ -60,7 +60,7 @@ module tt_um_zec_square1 (
   // last clock cycle's value of VSync
   reg prev_vsync;
 
-  always @(posedge clk) begin
+  always @(posedge clk or negedge rst_n) begin
     if (~rst_n) begin
       frame_no <= 9'd0;
       prev_vsync <= 1;
@@ -129,7 +129,7 @@ module tt_um_zec_square1 (
     end
   endgenerate
 
-  always @(posedge clk) begin
+  always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
       {R, G, B} <= 6'd0;
     end

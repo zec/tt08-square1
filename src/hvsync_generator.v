@@ -44,7 +44,7 @@ module hvsync_generator(
 
 // For VGA video, VSync and HSync are active-low.
 
-always @(posedge clk) begin
+always @(posedge clk or posedge reset) begin
   if (reset) begin
     {vsync, hsync} <= 2'b11;
     hpos <= 10'd0;

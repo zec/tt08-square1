@@ -45,7 +45,7 @@ module logs_iterate_map #(
 
   reg [($clog2(CYCLE_LEN)-1):0] counter;
 
-  always @(posedge clk) begin
+  always @(posedge clk or posedge reset) begin
     if (reset) begin
       x <= INITIAL_X;
       next_ready <= 0;

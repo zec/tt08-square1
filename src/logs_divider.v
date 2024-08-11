@@ -18,7 +18,7 @@ module logs_divider #(
   parameter NBITS = $clog2(N);
   reg [(NBITS-1):0] counter;
 
-  always @(posedge clk) begin
+  always @(posedge clk or posedge reset) begin
     if (reset) begin
       counter <= 0;
       mod_n <= 0;

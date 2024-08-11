@@ -21,7 +21,7 @@ module logs_nco #(
   // our phase accumulator
   reg [(N-1):0] phase;
 
-  always @(posedge clk) begin
+  always @(posedge clk or posedge reset) begin
     if (reset) begin
       phase <= 0;
       snd <= 0;

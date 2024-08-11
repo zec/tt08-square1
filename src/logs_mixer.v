@@ -36,7 +36,7 @@ module logs_mixer #(
     .sum(sum[(SUM_WIDTH-1):0])
   );
 
-  always @(posedge clk) begin
+  always @(posedge clk or posedge reset) begin
     if (reset) begin
       audio_out <= 0;
       counter <= 0;
