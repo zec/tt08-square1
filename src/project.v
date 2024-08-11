@@ -35,7 +35,7 @@ module tt_um_zec_square1 (
 
   hvsync_generator sync_gen(
       .clk(clk),
-      .reset(~rst_n),
+      .rst_n(rst_n),
       .vsync(vsync),
       .hsync(hsync),
       .hpos(hpos),
