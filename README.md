@@ -1,4 +1,7 @@
-![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg) ![](../../workflows/test/badge.svg) ![](../../workflows/fpga/badge.svg)
+# NOTE: THIS BRANCH IS ABANDONED
+
+The experiment I undertook on this branch didn't pan out.
+I'm leaving it for the historical record.
 
 # SQUARE-1
 
