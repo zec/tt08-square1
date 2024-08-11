@@ -53,7 +53,7 @@ a "racing the beam" implementation requires little silicon area.
 SQUARE-1 uses $N = 9$ and accepts that the bottom bit of the square gets
 lost off the 640×480 screen.
 
-_However,_ the results of a simple implementation of the algorithm would not
+_However,_ a simple implementation of the algorithm would not
 _look_ much like the original version!
 PDP-1 munching squares uses a Type 30 point display, which was built around
 a radar-scope CRT using P7 phosphor.
