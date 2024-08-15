@@ -33,7 +33,7 @@ While the demoscene dates to the mid-1980s, people have been making
 aesthetically-interesting graphics with a tiny amount of code for much longer.
 One of the earliest "display hacks"
 is [munching squares], first implemented _c._ 1962 on
-MIT's [PDP-1] (hence the demo's name).
+MIT's [PDP-1] (hence this demo's name).
 The original version has feedback and user-configurability
 (see [Norbert Landsteiner's write-up] for more details and a PDP-1 emulator),
 but a simple variant requires only two $N$-bit
@@ -49,7 +49,7 @@ loop
 ```
 
 As the algorithm has so little state and involves simple operations,
-a "racing the beam" implementation requires little silicon area.
+a "[racing the beam]" implementation requires little silicon area.
 SQUARE-1 uses $N = 9$ and accepts that the bottom bit of the square gets
 lost off the 640×480 screen.
 
@@ -61,7 +61,7 @@ P7 is actually a combination of two substances&mdash;a bright, short-persistence
 (decay constant ~20 microseconds) far-blue phosphor excited by
 the electron beam, and a dimmer, long-persistence
 (main decay constant ~100 milliseconds,
-but with a long tail lasting ~seconds)
+but with a long tail lasting several seconds)
 yellow phosphor excited by the light from the
 blue phosphor. As a result, the plotted points have a
 white or blue-white appearance, then become yellow and visibly fade away.
@@ -136,4 +136,5 @@ all this feasible.
 [munching squares]: https://en.wikipedia.org/wiki/Munching_square
 [PDP-1]: https://en.wikipedia.org/wiki/PDP-1
 [Norbert Landsteiner's write-up]: https://www.masswerk.at/minskytron/
+[racing the beam]: https://en.wikipedia.org/wiki/Racing_the_Beam#Content
 [logistic map]: https://en.wikipedia.org/wiki/Logistic_map
